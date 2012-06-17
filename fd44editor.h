@@ -38,7 +38,7 @@ private:
     QByteArray writeToBIOS(const QByteArray & bios, const bios_t & data);
 
     bios_t readFromUI();
-    void writeToUI(bios_t &data);
+    void writeToUI(bios_t data);
 };
 
 #endif // FD44EDITOR_H

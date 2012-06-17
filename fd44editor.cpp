@@ -342,7 +342,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
 }
 
 
-void FD44Editor::writeToUI(bios_t & data)
+void FD44Editor::writeToUI(bios_t data)
 {
     switch (data.state)
     {
@@ -367,7 +367,7 @@ void FD44Editor::writeToUI(bios_t & data)
     // List-based detection
     bool lanDetected = false;
     if(data.gbe.lan == UnknownLan)
-        for(int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
+        for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
             if (data.be.motherboard_name == QByteArray(MB_FEATURE_LIST[i].name, BOOTEFI_MOTHERBOARD_NAME_LENGTH))
             {
                 data.gbe.lan = MB_FEATURE_LIST[i].lan;
@@ -377,7 +377,7 @@ void FD44Editor::writeToUI(bios_t & data)
 
     bool dtsDetected = false;
     if(data.fd44.dts_type == UnknownDts)
-        for(int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
+        for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
             if (data.be.motherboard_name == QByteArray(MB_FEATURE_LIST[i].name, BOOTEFI_MOTHERBOARD_NAME_LENGTH))
             {
                 data.fd44.dts_type = MB_FEATURE_LIST[i].dts_type;
