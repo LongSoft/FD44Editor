@@ -24,14 +24,14 @@ public:
 
 private slots:
     void openImageFile();
-	void saveImageFile();
-	void setMbsnInputMask(bool oldMbsn);
-	void enableSaveButtons();
+    void saveImageFile();
+    void setMbsnInputMask(bool old);
+    void enableSaveButtons();
     void enableMac2Edit();
 
 private:
     Ui::FD44Editor *ui;
-	QString lastError;
+    QString lastError, oldMbsn, newMbsn;
     bios_t opened;
 
     bios_t readFromBIOS(const QByteArray & bios);

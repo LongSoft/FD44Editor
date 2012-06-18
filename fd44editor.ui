@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>237</width>
-    <height>477</height>
+    <width>262</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -282,7 +282,7 @@
        <bool>false</bool>
       </property>
       <property name="title">
-       <string>System UUID</string>
+       <string>System UUID (10 significant bytes)</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="margin">
@@ -325,17 +325,17 @@
        <item row="0" column="2">
         <widget class="QRadioButton" name="oldMbsnFormatRadioButton">
          <property name="text">
-          <string>Old format</string>
+          <string>Letter format</string>
          </property>
          <property name="checked">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
+       <item row="0" column="3" colspan="2">
         <widget class="QRadioButton" name="newMbsnFormatRadioButton">
          <property name="text">
-          <string>New format</string>
+          <string>Number format</string>
          </property>
          <property name="checked">
           <bool>true</bool>
