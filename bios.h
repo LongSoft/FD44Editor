@@ -5,7 +5,7 @@
 #include "motherboards.h"
 
 // BIOS markers to detect available features
-static const char BOOTEFI_HEADER[] =                {'$','B','O','O','T','E','F','I','$'};
+static const char BOOTEFI_HEADER[] =                            {'$','B','O','O','T','E','F','I','$'};
 static const char BOOTEFI_MAGIC_LENGTH = 3;
 static const char BOOTEFI_BIOS_VERSION_LENGTH = 2;
 
@@ -54,7 +54,7 @@ static const char DTS_LONG_PART2[] =                            {'\x04','\x04','
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
 static const char DTS_LONG_MASK[] =                             {'\x00','\x00','\x00','\xFF','\xFF',
-                                                                '\x00','\x00','\x00'};
+                                                                 '\x00','\x00','\x00'};
 static const char DTS_LONG_PART3[] =                            {'\x04','\x00','\x00','\x23','\x33',
                                                                  '\x00'};
 
@@ -63,7 +63,7 @@ static const unsigned int UUID_LENGTH = 16;
 
 static const char MBSN_HEADER[] =                               {'\x02','\x07','\x10','\x00'};
 static const char MBSN_BODY_LENGTH = 16;
-static const char MBSN_OLD_FORMAT_SIGN[] =		        {'M','T','7'};
+static const char MBSN_OLD_FORMAT_SIGN[] =		                {'M','T','7'};
 
 static const unsigned int MODULE_LENGTH = 552;
 
@@ -74,7 +74,7 @@ typedef struct {
 } bootefi_t;
 
 typedef struct {
-    lan_e lan;
+    lan_e lan_type;
     QByteArray mac;
     QByteArray mac2;
 } gbe_t;

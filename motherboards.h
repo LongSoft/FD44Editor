@@ -9,7 +9,7 @@ static const unsigned int BOOTEFI_MOTHERBOARD_NAME_LENGTH = 60;
 
 typedef struct {
     char name[BOOTEFI_MOTHERBOARD_NAME_LENGTH];
-    lan_e lan;
+    lan_e lan_type;
     dts_e dts_type;
 } motherboard_t;
 

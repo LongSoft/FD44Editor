@@ -90,7 +90,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
 {
     bios_t data;
     data.fd44.dts_type = UnknownDts;
-    data.gbe.lan = UnknownLan;
+    data.gbe.lan_type = UnknownLan;
     // Detecting motherboard model and BIOS version
     int pos = bios.lastIndexOf(QByteArray::fromRawData(BOOTEFI_HEADER, sizeof(BOOTEFI_HEADER)));
     if (pos == -1)
@@ -112,10 +112,10 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         data.gbe.mac = bios.mid(pos - MAC_LENGTH, MAC_LENGTH);
         int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
         data.gbe.mac2 = bios.mid(pos2 - MAC_LENGTH, MAC_LENGTH);
-        if (data.gbe.mac == data.gbe.mac2)
-            data.gbe.lan = Intel;
+        if (pos == pos2)
+            data.gbe.lan_type = Intel;
         else
-            data.gbe.lan = DualIntel;
+            data.gbe.lan_type = DualIntel;
     }
 
     pos = bios.lastIndexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)));
@@ -143,7 +143,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     if (moduleBody.count('\xFF') == moduleBody.size())
     {
         data.state = Empty;
-        data.gbe.lan = UnknownLan;
+        data.gbe.lan_type = UnknownLan;
         data.fd44.dts_type = UnknownDts;
         return data;
     }
@@ -152,7 +152,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     pos = moduleBody.lastIndexOf(QByteArray::fromRawData(MAC_HEADER, sizeof(MAC_HEADER)));
     if (pos != -1)
     {
-        data.gbe.lan = Realtek;
+        data.gbe.lan_type = Realtek;
         data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + sizeof(MAC_HEADER), MAC_ASCII_LENGTH));
     }
     // Searching for DTS block
@@ -224,7 +224,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     data.fd44.uuid = moduleBody.mid(pos, UUID_LENGTH);
 
     // If MAC is not found earlier, using MAC part of UUID
-    if(data.gbe.lan == UnknownLan)
+    if(data.gbe.lan_type == UnknownLan)
     {
         data.fd44.mac = data.fd44.uuid.right(MAC_LENGTH);
     }
@@ -274,7 +274,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
 
     QByteArray module;
     // Realtek MAC
-    if(data.gbe.lan == Realtek)
+    if(data.gbe.lan_type == Realtek)
     {
         module.append(MAC_HEADER, sizeof(MAC_HEADER));
         QByteArray encodedMac = data.fd44.mac.toHex().toUpper();
@@ -306,7 +306,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     // UUID
     module.append(UUID_HEADER, sizeof(UUID_HEADER));
     module.append(data.fd44.uuid);
-    if (data.gbe.lan == Realtek)
+    if (data.gbe.lan_type == Realtek)
         module.append(data.fd44.mac);
     else
         module.append(data.gbe.mac);
@@ -324,7 +324,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
         sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH + sizeof(MODULE_HEADER_PART2);
     newBios.replace(pos, module.length(), module);
 
-    if(data.gbe.lan == Realtek)
+    if(data.gbe.lan_type == Realtek)
         return newBios;
 
     // Replacing MACs
@@ -333,9 +333,9 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     if (pos != -1)
     {
         newBios.replace(pos - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
-        if (data.gbe.lan == DualIntel)
+        if (data.gbe.lan_type == DualIntel)
             newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac2);
-        else if (data.gbe.lan == Intel)
+        else if (data.gbe.lan_type == Intel)
             newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
     }
     return newBios;
@@ -366,11 +366,11 @@ void FD44Editor::writeToUI(bios_t data)
 
     // List-based detection
     bool lanDetected = false;
-    if(data.gbe.lan == UnknownLan)
+    if(data.gbe.lan_type == UnknownLan)
         for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
             if (data.be.motherboard_name == QByteArray(MB_FEATURE_LIST[i].name, BOOTEFI_MOTHERBOARD_NAME_LENGTH))
             {
-                data.gbe.lan = MB_FEATURE_LIST[i].lan;
+                data.gbe.lan_type = MB_FEATURE_LIST[i].lan_type;
                 ui->lanEdit->setText(tr("Found in database"));
                 lanDetected = true;
             }
@@ -385,7 +385,7 @@ void FD44Editor::writeToUI(bios_t data)
                 dtsDetected = true;
             }
 
-    switch(data.gbe.lan)
+    switch(data.gbe.lan_type)
     {
     case UnknownLan:
         if (!lanDetected)
@@ -469,14 +469,14 @@ bios_t FD44Editor::readFromUI()
             data.fd44.dts_type = Long;
     }
 
-    if(data.gbe.lan == UnknownLan)
+    if(data.gbe.lan_type == UnknownLan)
     {
         if(ui->lanComboBox->currentIndex() == 1)
-            data.gbe.lan = Intel;
+            data.gbe.lan_type = Intel;
         else if (ui->lanComboBox->currentIndex() == 2)
-            data.gbe.lan = DualIntel;
+            data.gbe.lan_type = DualIntel;
         else
-            data.gbe.lan = Realtek;
+            data.gbe.lan_type = Realtek;
     }
     data.gbe.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
     data.gbe.mac2 = QByteArray::fromHex(ui->mac2Edit->text().toAscii());
@@ -518,5 +518,13 @@ void FD44Editor::enableSaveButtons()
 
 void FD44Editor::enableMac2Edit()
 {
-    ui->mac2Edit->setEnabled(ui->lanComboBox->currentIndex() == 2);
+    if(ui->lanComboBox->currentIndex() == 2)
+    {
+        ui->mac2Edit->setEnabled(true);
+    }
+    else
+    {
+        ui->mac2Edit->setEnabled(false);
+        ui->mac2Edit->setText("");
+    }
 }
