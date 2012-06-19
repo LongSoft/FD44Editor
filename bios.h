@@ -76,7 +76,6 @@ typedef struct {
 typedef struct {
     lan_e lan_type;
     QByteArray mac;
-    QByteArray mac2;
 } gbe_t;
 
 

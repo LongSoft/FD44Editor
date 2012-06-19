@@ -14,7 +14,6 @@ FD44Editor::FD44Editor(QWidget *parent) :
     connect(ui->uuidEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
     connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
     connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
-    connect(ui->lanComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(enableMac2Edit()));
 }
 
 FD44Editor::~FD44Editor()
@@ -110,15 +109,11 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     if (pos != -1) // Intel LAN
     {
         data.gbe.mac = bios.mid(pos - MAC_LENGTH, MAC_LENGTH);
-        int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
-        data.gbe.mac2 = bios.mid(pos2 - MAC_LENGTH, MAC_LENGTH);
-        if (pos == pos2)
-            data.gbe.lan_type = Intel;
-        else
-            data.gbe.lan_type = DualIntel;
+        data.gbe.lan_type = Intel;
     }
 
-    pos = bios.lastIndexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)));
+    // Searching for non-empty module
+    pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)));
     if (pos == -1)
     {
         lastError = tr("Module is not found");
@@ -126,21 +121,30 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         return data;
     }
 
-    // Reading module
-    QByteArray module = bios.mid(pos, MODULE_LENGTH);
-    pos = sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH;
-
-    // Checking 2nd part of module header
-    if (module.mid(pos, sizeof(MODULE_HEADER_PART2)) != QByteArray::fromRawData(MODULE_HEADER_PART2, sizeof(MODULE_HEADER_PART2)))
+    bool isEmpty = true;
+    QByteArray module, moduleBody;
+    while (isEmpty && pos != -1)
     {
-        lastError = tr("Part 2 of module header is unknown");
-        data.state = ParseError;
-        return data;
+        module = bios.mid(pos, MODULE_LENGTH);
+        pos += sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH;
+
+        // Checking 2nd part of module header
+        if (module.mid(sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH, sizeof(MODULE_HEADER_PART2)) != QByteArray::fromRawData(MODULE_HEADER_PART2, sizeof(MODULE_HEADER_PART2)))
+        {
+            lastError = tr("Part 2 of module header is unknown");
+            data.state = ParseError;
+            return data;
+        }
+
+        // Checking for empty module
+        moduleBody = module.right(MODULE_LENGTH - sizeof(MODULE_HEADER_PART1) - MODULE_HEADER_ME_VERSION_LENGTH - sizeof(MODULE_HEADER_PART2));
+        if (moduleBody.count('\xFF') != moduleBody.size())
+            isEmpty = false;
+        else
+            pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)), pos);
     }
 
-    // Checking for empty module
-    QByteArray moduleBody = module.right(MODULE_LENGTH - sizeof(MODULE_HEADER_PART1) - MODULE_HEADER_ME_VERSION_LENGTH - sizeof(MODULE_HEADER_PART2));
-    if (moduleBody.count('\xFF') == moduleBody.size())
+    if (isEmpty)
     {
         data.state = Empty;
         data.gbe.lan_type = UnknownLan;
@@ -148,6 +152,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         return data;
     }
 
+
+    // Reading module data
     // Searching for MAC block
     pos = moduleBody.lastIndexOf(QByteArray::fromRawData(MAC_HEADER, sizeof(MAC_HEADER)));
     if (pos != -1)
@@ -226,6 +232,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     // If MAC is not found earlier, using MAC part of UUID
     if(data.gbe.lan_type == UnknownLan)
     {
+        data.gbe.mac = data.fd44.uuid.right(MAC_LENGTH);
         data.fd44.mac = data.fd44.uuid.right(MAC_LENGTH);
     }
 
@@ -339,10 +346,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     if (pos != -1)
     {
         newBios.replace(pos - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
-        if (data.gbe.lan_type == DualIntel)
-            newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac2);
-        else if (data.gbe.lan_type == Intel)
-            newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
+        newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
     }
     return newBios;
 }
@@ -373,8 +377,7 @@ void FD44Editor::writeToUI(bios_t data)
     // List-based detection
     // LAN type detection
     bool lanDetected = false;
-    // TODO: Improve module LAN detection code and revert this
-    if(true) //if(data.gbe.lan_type == UnknownLan)
+    if(data.gbe.lan_type == UnknownLan)
         for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
             if (data.be.motherboard_name == QByteArray(MB_FEATURE_LIST[i].name, BOOTEFI_MOTHERBOARD_NAME_LENGTH))
             {
@@ -414,13 +417,13 @@ void FD44Editor::writeToUI(bios_t data)
 		ui->lanComboBox->setCurrentIndex(1);
         ui->macEdit->setText(data.gbe.mac.toHex());
         break;
-    case DualIntel:
+    /*case DualIntel:
         if (!lanDetected)
             ui->lanEdit->setText(tr("Detected from GbE region"));
         ui->lanComboBox->setEnabled(false);
         ui->lanComboBox->setCurrentIndex(2);
         ui->macEdit->setText(data.gbe.mac.toHex());
-        ui->mac2Edit->setText(data.gbe.mac2.toHex());
+        ui->mac2Edit->setText(data.gbe.mac2.toHex());*/
     }
 	
     ui->uuidEdit->setText(data.fd44.uuid.toHex()); // UUID
@@ -481,13 +484,12 @@ bios_t FD44Editor::readFromUI()
     {
         if(ui->lanComboBox->currentIndex() == 1)
             data.gbe.lan_type = Intel;
-        else if (ui->lanComboBox->currentIndex() == 2)
-            data.gbe.lan_type = DualIntel;
+        /*else if (ui->lanComboBox->currentIndex() == 2)
+            data.gbe.lan_type = DualIntel;*/
         else
             data.gbe.lan_type = Realtek;
     }
     data.gbe.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
-    data.gbe.mac2 = QByteArray::fromHex(ui->mac2Edit->text().toAscii());
     data.fd44.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
     data.fd44.uuid = QByteArray::fromHex(ui->uuidEdit->text().toAscii());
     data.fd44.dts_key = data.fd44.uuid.right(DTS_KEY_LENGTH);
@@ -517,22 +519,8 @@ void FD44Editor::enableSaveButtons()
 {
     if (ui->uuidEdit->text().length() == ui->uuidEdit->maxLength()
         && ui->macEdit->text().length() == ui->macEdit->maxLength()
-        && ui->mbsnEdit->text().length() == ui->mbsnEdit->maxLength()
-        && ui->mac2Edit->isEnabled() ? ui->mac2Edit->text().length() == ui->mac2Edit->maxLength() : true)
+        && ui->mbsnEdit->text().length() == ui->mbsnEdit->maxLength())
             ui->toFileButton->setEnabled(true);
     else
         ui->toFileButton->setEnabled(false);
-}
-
-void FD44Editor::enableMac2Edit()
-{
-    if(ui->lanComboBox->currentIndex() == 2)
-    {
-        ui->mac2Edit->setEnabled(true);
-    }
-    else
-    {
-        ui->mac2Edit->setEnabled(false);
-        ui->mac2Edit->setText("");
-    }
 }

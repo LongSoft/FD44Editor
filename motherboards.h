@@ -3,7 +3,7 @@
 
 #include <QByteArray>
 
-enum lan_e {UnknownLan, Realtek, Intel, DualIntel};
+enum lan_e {UnknownLan, Realtek, Intel};
 enum dts_e {UnknownDts, None, Short, Long};
 static const unsigned int BOOTEFI_MOTHERBOARD_NAME_LENGTH = 60;
 
@@ -15,19 +15,19 @@ typedef struct {
 
 static const motherboard_t MB_FEATURE_LIST[] = {
     // P67
-    {"MaximusIV-Extreme", DualIntel, None},
+    {"MaximusIV-Extreme", Intel, None},
 	{"P8P67", Realtek, Short},
     {"P8P67-DELUXE", Intel, Long},
     {"P8P67-EVO", Intel, Short},
     //{"P8P67-LE", Realtek, None},
     {"P8P67-PRO", Intel, Short},
-    {"P8P67-WS-REVOLUTION", DualIntel, None},
+    {"P8P67-WS-REVOLUTION", Intel, None},
     //{"P8P67-M", Realtek, None},
     //{"P8P67-M-PRO", Realtek, None},
     {"SABERTOOTH-P67", Intel, Short},
 	
     // Z68
-    {"Maximus-IV-Extreme-Z", DualIntel, None},
+    {"Maximus-IV-Extreme-Z", Intel, None},
     {"MaximusIV-GENE-Z", Intel, None},
     {"MAXIMUS-IV-GENE-Z-GEN3", Intel, None},
     {"P8Z68-DELUXE", Intel, Long},

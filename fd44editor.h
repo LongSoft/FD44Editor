@@ -27,7 +27,6 @@ private slots:
     void saveImageFile();
     void setMbsnInputMask(bool old);
     void enableSaveButtons();
-    void enableMac2Edit();
 
 private:
     Ui::FD44Editor *ui;
