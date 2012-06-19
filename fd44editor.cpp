@@ -25,7 +25,7 @@ FD44Editor::~FD44Editor()
 
 void FD44Editor::openImageFile()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS Image file (*.rom *.bin)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS image file (*.rom *.bin)");
 
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
@@ -52,7 +52,7 @@ void FD44Editor::openImageFile()
 
 void FD44Editor::saveImageFile()
 {
-    QString path = QFileDialog::getSaveFileName(this, tr("Save BIOS image file"),".","*.rom");
+    QString path = QFileDialog::getSaveFileName(this, tr("Save BIOS image file"),".","BIOS image file (*.rom *.bin)");
 
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
@@ -319,10 +319,16 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     // FFs
     module.append(QByteArray(MODULE_LENGTH - sizeof(MODULE_HEADER_PART1) - MODULE_HEADER_ME_VERSION_LENGTH - sizeof(MODULE_HEADER_PART2) - module.length(), '\xFF'));
 
+    // Replacing all modules
     QByteArray newBios = bios;
-    pos = bios.lastIndexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1))) +
-        sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH + sizeof(MODULE_HEADER_PART2);
-    newBios.replace(pos, module.length(), module);
+    pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)));
+    while(pos != -1)
+    {
+        pos += sizeof(MODULE_HEADER_PART1) + MODULE_HEADER_ME_VERSION_LENGTH + sizeof(MODULE_HEADER_PART2);
+		newBios.replace(pos, module.length(), module);
+        pos += module.length();
+        pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER_PART1, sizeof(MODULE_HEADER_PART1)), pos);
+    }
 
     if(data.gbe.lan_type == Realtek)
         return newBios;
@@ -365,8 +371,10 @@ void FD44Editor::writeToUI(bios_t data)
     ui->versionEdit->setText(QString("%1%2").arg((int)data.be.bios_version.at(0),2,10,QChar('0')).arg((int)data.be.bios_version.at(1),2,10,QChar('0')));
 
     // List-based detection
+    // LAN type detection
     bool lanDetected = false;
-    if(data.gbe.lan_type == UnknownLan)
+    // TODO: Improve module LAN detection code and revert this
+    if(true) //if(data.gbe.lan_type == UnknownLan)
         for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
             if (data.be.motherboard_name == QByteArray(MB_FEATURE_LIST[i].name, BOOTEFI_MOTHERBOARD_NAME_LENGTH))
             {
@@ -374,7 +382,7 @@ void FD44Editor::writeToUI(bios_t data)
                 ui->lanEdit->setText(tr("Found in database"));
                 lanDetected = true;
             }
-
+    // DTS type detection
     bool dtsDetected = false;
     if(data.fd44.dts_type == UnknownDts)
         for(unsigned int i = 0; i < MB_FEATURE_LIST_LENGTH; i++)
