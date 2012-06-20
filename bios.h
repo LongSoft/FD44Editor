@@ -16,16 +16,13 @@ static const char GBE_HEADER[] =                                {'\x00', '\x08',
                                                                  '\x10'};
 
 // FD44 module structure
-static const char MODULE_HEADER_PART1[]	=                       {'\x0B','\x82','\x44','\xFD','\xAB',
+static const char MODULE_HEADER[] =                             {'\x0B','\x82','\x44','\xFD','\xAB',
                                                                  '\xF1','\xC0','\x41','\xAE','\x4E',
                                                                  '\x0C','\x55','\x55','\x6E','\xB9',
-                                                                 '\xBD','\xD3'};
-static const unsigned int MODULE_HEADER_ME_VERSION_LENGTH = 1;
-static const char MODULE_HEADER_PART2[] =                       {'\x02','\x00','\x28','\x02','\x00',
-                                                                 '\xF8','\x10','\x02','\x00','\x19',
-                                                                 '\x42','\x53','\x41','\x5F','\x00',
-                                                                 '\x02','\x00','\x00'};
-
+                                                                 '\xBD'};
+static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
+static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
+static const unsigned int MODULE_HEADER_LENGTH = 36;
 static const char MAC_HEADER[] =                                {'\x0B','\x01','\x0D','\x00'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
