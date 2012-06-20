@@ -23,6 +23,8 @@ static const char MODULE_HEADER[] =                             {'\x0B','\x82','
 static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
 static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
 static const unsigned int MODULE_HEADER_LENGTH = 36;
+
+// Realtec MAC
 static const char MAC_HEADER[] =                                {'\x0B','\x01','\x0D','\x00'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
@@ -43,16 +45,24 @@ static const char DTS_LONG_PART2[] =                            {'\x04','\x04','
                                                                  '\x40','\x63','\x43','\x10','\x84',
                                                                  '\x83','\x03','\xDF','\x40','\x80',
                                                                  '\x00','\x20','\x00','\x73','\x3C',
-                                                                 '\x10','\x08','\x00','\x60','\x0F',
-                                                                 '\x43','\x10','\x15','\x04','\x20',
+                                                                 '\x10','\x08','\x00','\x60','\x0F'};
+static const unsigned int DTS_LONG_MAGIC_LENGTH = 13;
+static const char DTS_LONG_MAGIC_V1[] =                         {'\x43','\x10','\x15','\x04','\x20',
                                                                  '\x00','\x3C','\x10','\x00','\x00',
-                                                                 '\x00','\x43','\x10','\x00','\x00',
+                                                                 '\x00','\x43','\x10'};
+static const char DTS_LONG_MAGIC_V2[] =                         {'\x06','\x11','\x15','\x04','\x20',
+                                                                 '\x00','\x3C','\x10','\x00','\x00',
+                                                                 '\x00','\x00','\x00'}; //P67-M PRO
+static const char DTS_LONG_MAGIC_V3[] =                         {'\x43','\x10','\x84','\x83','\x20',
+                                                                 '\x00','\x3C','\x10','\x00','\x00',
+                                                                 '\x00','\x43','\x10'}; //P67 WS
+
+static const char DTS_LONG_PART3[] =                            {'\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00','\x00','\x00','\x00','\x00',
-                                                                 '\x00','\x00','\x00','\x00','\x00',
-                                                                 '\x00'};
+                                                                 '\x00','\x00','\x00'};
 static const char DTS_LONG_MASK[] =                             {'\x00','\x00','\x00','\xFF','\xFF',
                                                                  '\x00','\x00','\x00'};
-static const char DTS_LONG_PART3[] =                            {'\x04','\x00','\x00','\x23','\x33',
+static const char DTS_LONG_PART4[] =                            {'\x04','\x00','\x00','\x23','\x33',
                                                                  '\x00'};
 
 static const char UUID_HEADER[] =                               {'\x01','\x08','\x10','\x00'};
@@ -60,7 +70,7 @@ static const unsigned int UUID_LENGTH = 16;
 
 static const char MBSN_HEADER[] =                               {'\x02','\x07','\x10','\x00'};
 static const char MBSN_BODY_LENGTH = 16;
-static const char MBSN_OLD_FORMAT_SIGN[] =		                {'M','T','7'};
+static const char MBSN_LETTER_FORMAT_SIGN[] =		            {'M','T','7'};
 
 static const unsigned int MODULE_LENGTH = 552;
 
@@ -80,6 +90,7 @@ typedef struct {
     QByteArray mac;
     dts_e dts_type;
     QByteArray dts_key;
+    QByteArray dts_long_magic;
     QByteArray uuid;
     QByteArray mbsn;
 } fd44_t;

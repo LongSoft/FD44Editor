@@ -90,6 +90,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     bios_t data;
     data.fd44.dts_type = UnknownDts;
     data.gbe.lan_type = UnknownLan;
+    data.fd44.dts_long_magic = QByteArray::fromRawData(DTS_LONG_MAGIC_V1, sizeof(DTS_LONG_MAGIC_V1));
+
     // Detecting motherboard model and BIOS version
     int pos = bios.lastIndexOf(QByteArray::fromRawData(BOOTEFI_HEADER, sizeof(BOOTEFI_HEADER)));
     if (pos == -1)
@@ -192,6 +194,25 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         }
         pos += sizeof(DTS_LONG_PART2);
 
+        data.fd44.dts_long_magic = moduleBody.mid(pos, DTS_LONG_MAGIC_LENGTH);
+        if (data.fd44.dts_long_magic != QByteArray::fromRawData(DTS_LONG_MAGIC_V1, sizeof(DTS_LONG_MAGIC_V1))
+         && data.fd44.dts_long_magic != QByteArray::fromRawData(DTS_LONG_MAGIC_V2, sizeof(DTS_LONG_MAGIC_V2))
+         && data.fd44.dts_long_magic != QByteArray::fromRawData(DTS_LONG_MAGIC_V3, sizeof(DTS_LONG_MAGIC_V3)))
+        {
+            lastError = tr("Long DTS magic bytes are unknown");
+            data.state = ParseError;
+            return data;
+        }
+        pos += DTS_LONG_MAGIC_LENGTH;
+
+        if(moduleBody.mid(pos, sizeof(DTS_LONG_PART3)) != QByteArray::fromRawData(DTS_LONG_PART3, sizeof(DTS_LONG_PART3)))
+        {
+            lastError = tr("Part 3 of long DTS header is unknown");
+            data.state = ParseError;
+            return data;
+        }
+        pos += sizeof(DTS_LONG_PART3);
+
         QByteArray reversedKey = moduleBody.mid(pos, DTS_KEY_LENGTH);
         bool reversed = true;
         for(unsigned int i = 0; i < DTS_KEY_LENGTH; i++)
@@ -206,9 +227,9 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         }
         pos += DTS_KEY_LENGTH;
         
-        if(moduleBody.mid(pos, sizeof(DTS_LONG_PART3)) != QByteArray::fromRawData(DTS_LONG_PART3, sizeof(DTS_LONG_PART3)))
+        if(moduleBody.mid(pos, sizeof(DTS_LONG_PART4)) != QByteArray::fromRawData(DTS_LONG_PART4, sizeof(DTS_LONG_PART4)))
         {
-            lastError = tr("Part 3 of long DTS header is unknown");
+            lastError = tr("Part 4 of long DTS header is unknown");
             data.state = ParseError;
             return data;
         }
@@ -299,11 +320,13 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
         module.append(DTS_LONG_HEADER, sizeof(DTS_LONG_HEADER));
         module.append(data.fd44.dts_key);
         module.append(DTS_LONG_PART2, sizeof(DTS_LONG_PART2));
+        module.append(data.fd44.dts_long_magic);
+        module.append(DTS_LONG_PART3, sizeof(DTS_LONG_PART3));
         QByteArray reversedKey;
         for(unsigned int i = 0; i < DTS_KEY_LENGTH; i++)
             reversedKey.append(data.fd44.dts_key.at(DTS_KEY_LENGTH-1-i) ^ DTS_LONG_MASK[i]);
         module.append(reversedKey);
-        module.append(DTS_LONG_PART3, sizeof(DTS_LONG_PART3));
+        module.append(DTS_LONG_PART4, sizeof(DTS_LONG_PART4));
     }
 
     // UUID
@@ -424,7 +447,7 @@ void FD44Editor::writeToUI(bios_t data)
     
     ui->uuidEdit->setText(data.fd44.uuid.toHex()); // UUID
 
-    if(data.fd44.mbsn.left(sizeof(MBSN_OLD_FORMAT_SIGN)) == QByteArray(MBSN_OLD_FORMAT_SIGN,sizeof(MBSN_OLD_FORMAT_SIGN)))
+    if(data.fd44.mbsn.left(sizeof(MBSN_LETTER_FORMAT_SIGN)) == QByteArray(MBSN_LETTER_FORMAT_SIGN,sizeof(MBSN_LETTER_FORMAT_SIGN)))
         ui->oldMbsnFormatRadioButton->setChecked(true);
     else
         ui->newMbsnFormatRadioButton->setChecked(true);
