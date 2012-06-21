@@ -20,18 +20,20 @@ static const char MODULE_HEADER[] =                             {'\x0B','\x82','
                                                                  '\xF1','\xC0','\x41','\xAE','\x4E',
                                                                  '\x0C','\x55','\x55','\x6E','\xB9',
                                                                  '\xBD'};
+static const char MODULE_VERSION_X6X[] =                        {'\xD3'};
+static const char MODULE_VERSION_X7X[] =                        {'\xCD'};
 static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
 static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
 static const unsigned int MODULE_HEADER_LENGTH = 36;
 
-// Realtec MAC
-static const char MAC_HEADER[] =                                {'\x0B','\x01','\x0D','\x00'};
+static const char MAC_HEADER_X6X[] =                           {'\x0B','\x01','\x0D','\x00'};
+static const char MAC_HEADER_X7X[] =                           {'\x0B','\x01','\xAA','\xBB'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
 
-
 static const unsigned int DTS_KEY_LENGTH = 8;
-static const char DTS_SHORT_HEADER[] =                          {'\x8B','\x04','\x26','\x00'};
+static const char DTS_SHORT_HEADER_X6X[] =                      {'\x8B','\x04','\x26','\x00'};
+static const char DTS_SHORT_HEADER_X7X[] =                      {'\x8B','\x04','\xAA','\xBB'};
 static const char DTS_SHORT_PART2[] =                           {'\x04','\x04','\x32','\x55','\xF8',
                                                                  '\x00','\xA2','\x02','\xA1','\x00',
                                                                  '\x40','\x63','\x43','\x10','\xFE',
@@ -39,14 +41,16 @@ static const char DTS_SHORT_PART2[] =                           {'\x04','\x04','
                                                                  '\x00','\x20','\x00','\x73','\x3C',
                                                                  '\x10','\x08','\x00','\x00','\x00'};
 
-static const char DTS_LONG_HEADER[] =                           {'\x8B','\x04','\x4E','\x00'};
+static const char DTS_LONG_HEADER_X6X[] =                       {'\x8B','\x04','\x4E','\x00'};
+static const char DTS_LONG_HEADER_X7X[] =                       {'\x8B','\x04','\x00','\x00', '\x00',
+                                                                 '\x4E','\x00','\x00','\x02'};
 static const char DTS_LONG_PART2[] =                            {'\x04','\x04','\x32','\x55','\xF8',
                                                                  '\x00','\xA2','\x02','\xA1','\x00',
                                                                  '\x40','\x63','\x43','\x10','\x84',
                                                                  '\x83','\x03','\xDF','\x40','\x80',
                                                                  '\x00','\x20','\x00','\x73','\x3C',
                                                                  '\x10','\x08','\x00','\x60','\x0F'};
-static const unsigned int DTS_LONG_MAGIC_LENGTH = 13;
+
 static const char DTS_LONG_MAGIC_V1[] =                         {'\x43','\x10','\x15','\x04','\x20',
                                                                  '\x00','\x3C','\x10','\x00','\x00',
                                                                  '\x00','\x43','\x10'};
@@ -65,12 +69,15 @@ static const char DTS_LONG_MASK[] =                             {'\x00','\x00','
 static const char DTS_LONG_PART4[] =                            {'\x04','\x00','\x00','\x23','\x33',
                                                                  '\x00'};
 
-static const char UUID_HEADER[] =                               {'\x01','\x08','\x10','\x00'};
+static const char UUID_HEADER_X6X[] =                           {'\x01','\x08','\x10','\x00'};
+static const char UUID_HEADER_X7X[] =                           {'\x01','\x08','\x00','\x80','\x09',
+                                                                 '\x10','\x00','\x01','\x00'};
 static const unsigned int UUID_LENGTH = 16;
 
-static const char MBSN_HEADER[] =                               {'\x02','\x07','\x10','\x00'};
+static const char MBSN_HEADER_X6X[] =                           {'\x02','\x07','\x10','\x00'};
+static const char MBSN_HEADER_X7X[] =                           {'\x02','\x07','\x00','\x80','\x09',
+                                                                 '\x10','\x00','\x02','\x00'};
 static const char MBSN_BODY_LENGTH = 16;
-static const char MBSN_LETTER_FORMAT_SIGN[] =		            {'M','T','7'};
 
 static const unsigned int MODULE_LENGTH = 552;
 
@@ -81,14 +88,18 @@ typedef struct {
 } bootefi_t;
 
 typedef struct {
-    lan_e lan_type;
     QByteArray mac;
 } gbe_t;
 
+enum fd44_version_e
+{
+    x6x,
+    x7x
+};
 
 typedef struct {
+    fd44_version_e version;
     QByteArray mac;
-    dts_e dts_type;
     QByteArray dts_key;
     QByteArray dts_long_magic;
     QByteArray uuid;
@@ -106,6 +117,8 @@ typedef struct {
     bootefi_t be;
     gbe_t gbe;
     fd44_t fd44;
+    dts_e dts_type;
+    mac_storage_e mac_storage;
     bios_state_e state;
 } bios_t;
 

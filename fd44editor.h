@@ -25,12 +25,12 @@ public:
 private slots:
     void openImageFile();
     void saveImageFile();
-    void setMbsnInputMask(bool old);
+    void enableDtsMagicComboBox(int index);
     void enableSaveButtons();
 
 private:
     Ui::FD44Editor *ui;
-    QString lastError, oldMbsn, newMbsn;
+    QString lastError;
     bios_t opened;
 
     bios_t readFromBIOS(const QByteArray & bios);
