@@ -26,8 +26,8 @@ static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
 static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
 static const unsigned int MODULE_HEADER_LENGTH = 36;
 
-static const char MAC_HEADER_X6X[] =                           {'\x0B','\x01','\x0D','\x00'};
-static const char MAC_HEADER_X7X[] =                           {'\x0B','\x01','\xAA','\xBB'};
+static const char MAC_HEADER_X6X[] =                            {'\x0B','\x01','\x0D','\x00'};
+static const char MAC_HEADER_X7X[] =                            {'\x0B','\x01','\xAA','\xBB'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
 
@@ -77,7 +77,7 @@ static const unsigned int UUID_LENGTH = 16;
 static const char MBSN_HEADER_X6X[] =                           {'\x02','\x07','\x10','\x00'};
 static const char MBSN_HEADER_X7X[] =                           {'\x02','\x07','\x00','\x80','\x09',
                                                                  '\x10','\x00','\x02','\x00'};
-static const char MBSN_BODY_LENGTH = 16;
+static const unsigned int MBSN_BODY_LENGTH = 16;
 
 static const unsigned int MODULE_LENGTH = 552;
 

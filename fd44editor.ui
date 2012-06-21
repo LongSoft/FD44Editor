@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.5beta</string>
+   <string>FD44Editor v0.5.1 beta</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
