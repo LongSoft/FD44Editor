@@ -111,6 +111,12 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     pos += BOOTEFI_BIOS_VERSION_LENGTH;
     data.be.motherboard_name = bios.mid(pos, BOOTEFI_MOTHERBOARD_NAME_LENGTH);
 
+    // Detecting ME presence
+    bool isFull = false;
+    pos = bios.indexOf(QByteArray::fromRawData(ME_HEADER, sizeof(ME_HEADER)));
+    if (pos != -1)
+        isFull = true;
+
     // Detecting primary LAN MAC storage
     pos = bios.indexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
     if (pos != -1)
@@ -288,6 +294,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     {
         data.gbe.mac = data.fd44.uuid.right(MAC_LENGTH);
         data.fd44.mac = data.fd44.uuid.right(MAC_LENGTH);
+        if(isFull)
+            data.mac_storage = UUID;
     }
 
     // Searching for MBSN block

@@ -9,6 +9,12 @@ static const char BOOTEFI_HEADER[] =                            {'$','B','O','O'
 static const char BOOTEFI_MAGIC_LENGTH = 3;
 static const char BOOTEFI_BIOS_VERSION_LENGTH = 2;
 
+// ME header
+static const char ME_HEADER[] =                                 {'\x20','\x20','\x80','\x0F','\x40',
+                                                                 '\x00','\x00','\x10','\x00','\x00',
+                                                                 '\x00','\x00','\x00','\x00','\x00',
+                                                                '\x00'};
+
 // GbE header
 static const char GBE_HEADER[] =                                {'\x00', '\x08', '\xFF', '\xFF', '\xD4',
                                                                  '\x00', '\xFF', '\xFF', '\xFF', '\xFF',
