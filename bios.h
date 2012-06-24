@@ -33,7 +33,8 @@ static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', 
 static const unsigned int MODULE_HEADER_LENGTH = 36;
 
 static const char MAC_HEADER_X6X[] =                            {'\x0B','\x01','\x0D','\x00'};
-static const char MAC_HEADER_X7X[] =                            {'\x0B','\x01','\xAA','\xBB'};
+static const char MAC_HEADER_X7X[] =                            {'\x0B','\x01','\x00','\x80','\x09',
+                                                                 '\x0D','\x00','\x2D','\x00'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
 
