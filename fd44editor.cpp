@@ -110,6 +110,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     data.be.bios_version = bios.mid(pos, BOOTEFI_BIOS_VERSION_LENGTH);
     pos += BOOTEFI_BIOS_VERSION_LENGTH;
     data.be.motherboard_name = bios.mid(pos, BOOTEFI_MOTHERBOARD_NAME_LENGTH);
+    pos += BOOTEFI_MOTHERBOARD_NAME_LENGTH + BOOTEFI_BIOS_DATE_OFFSET;
+    data.be.bios_date = bios.mid(pos, BOOTEFI_BIOS_DATE_LENGTH);
 
     // Detecting ME presence
     bool isFull = false;
@@ -466,6 +468,7 @@ void FD44Editor::writeToUI(bios_t data)
 
     ui->mbEdit->setText(data.be.motherboard_name);
     ui->versionEdit->setText(QString("%1%2").arg((int)data.be.bios_version.at(0),2,10,QChar('0')).arg((int)data.be.bios_version.at(1),2,10,QChar('0')));
+    ui->dateEdit->setText(data.be.bios_date);
 
     // List-based detection
     // LAN type detection
