@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>479</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.5.2 beta</string>
+   <string>FD44Editor v0.5.3.2 beta</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -62,7 +62,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="mbEdit">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -85,7 +85,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="versionEdit">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -108,7 +108,7 @@
        <item row="2" column="1">
         <widget class="QLineEdit" name="dateEdit">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -131,7 +131,7 @@
        <item row="3" column="1">
         <widget class="QLineEdit" name="lanEdit">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -154,7 +154,7 @@
        <item row="4" column="1">
         <widget class="QLineEdit" name="dtsEdit">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -196,7 +196,7 @@
         <widget class="QComboBox" name="lanComboBox">
          <item>
           <property name="text">
-           <string>GbE Region and UUID (Intel)</string>
+           <string>GbE region and UUID (Intel)</string>
           </property>
          </item>
          <item>
@@ -243,6 +243,9 @@
        <string>DTS key</string>
       </property>
       <layout class="QFormLayout" name="formLayout_3">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <property name="horizontalSpacing">
         <number>4</number>
        </property>
@@ -307,6 +310,29 @@
          </item>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Key bytes</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="dtsKeyEdit">
+         <property name="inputMask">
+          <string>&gt;HH HH HH HH HH HH HH HH;_</string>
+         </property>
+         <property name="text">
+          <string>       </string>
+         </property>
+         <property name="maxLength">
+          <number>23</number>
+         </property>
+         <property name="cursorPosition">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -335,6 +361,9 @@
          </property>
          <property name="maxLength">
           <number>29</number>
+         </property>
+         <property name="cursorPosition">
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -366,6 +395,9 @@
          </property>
          <property name="maxLength">
           <number>15</number>
+         </property>
+         <property name="cursorPosition">
+          <number>0</number>
          </property>
         </widget>
        </item>

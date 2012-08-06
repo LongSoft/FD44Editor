@@ -14,6 +14,7 @@ FD44Editor::FD44Editor(QWidget *parent) :
     connect(ui->uuidEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
     connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
     connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
+    connect(ui->dtsKeyEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
 
     // Inserting data to dtsMagicBytesComboBox
     ui->dtsMagicBytesComboBox->setItemData(0, QByteArray::fromRawData(DTS_LONG_MAGIC_V1, sizeof(DTS_LONG_MAGIC_V1)));
@@ -101,7 +102,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     int pos = bios.lastIndexOf(QByteArray::fromRawData(BOOTEFI_HEADER, sizeof(BOOTEFI_HEADER)));
     if (pos == -1)
     {
-        lastError = tr("$BOOTEFI$ is not found");
+        lastError = tr("$BOOTEFI$ signature is not found. Please open correct BIOS file");
         data.state = ParseError;
         return data;
     }
@@ -624,7 +625,12 @@ void FD44Editor::enableSaveButtons()
     if (ui->uuidEdit->text().length() == ui->uuidEdit->maxLength()
         && ui->macEdit->text().length() == ui->macEdit->maxLength()
         && ui->mbsnEdit->text().length() == ui->mbsnEdit->maxLength())
+    {
+        if (ui->dtsKeyEdit->isEnabled() && ui->dtsKeyEdit->text().length() != ui->dtsKeyEdit->maxLength())
+            ui->toFileButton->setEnabled(false);
+        else
             ui->toFileButton->setEnabled(true);
+    }
     else
         ui->toFileButton->setEnabled(false);
 }
