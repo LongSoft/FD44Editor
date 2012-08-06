@@ -123,6 +123,10 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     pos = bios.indexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
     if (pos != -1)
     {
+        int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
+        if (pos != pos2 && bios.mid(pos - MAC_LENGTH, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
+            pos = pos2;
+
         data.gbe.mac = bios.mid(pos - MAC_LENGTH, MAC_LENGTH);
         data.mac_storage = GbE;
     }
@@ -533,25 +537,37 @@ void FD44Editor::writeToUI(bios_t data)
         if (!dtsDetected)
             ui->dtsEdit->setText(tr("Not detected"));
         ui->dtsGroupBox->setEnabled(true);
+        ui->dtsTypeComboBox->setEnabled(true);
+        ui->dtsMagicBytesComboBox->setEnabled(true);
+        ui->dtsKeyEdit->setEnabled(true);
         break;
     case None:
         if (!dtsDetected)
             ui->dtsEdit->setText(tr("Detected from module"));
         ui->dtsTypeComboBox->setCurrentIndex(0);
         ui->dtsGroupBox->setEnabled(false);
+        ui->dtsKeyEdit->setText("");
         break;
     case Short:
         if (!dtsDetected)
             ui->dtsEdit->setText(tr("Detected from module"));
         ui->dtsTypeComboBox->setCurrentIndex(1);
-        ui->dtsGroupBox->setEnabled(false);
+        ui->dtsGroupBox->setEnabled(true);
+        ui->dtsTypeComboBox->setEnabled(false);
+        ui->dtsMagicBytesComboBox->setEnabled(false);
+        ui->dtsKeyEdit->setEnabled(true);
+        ui->dtsKeyEdit->setText(data.fd44.dts_key.toHex());
         break;
     case Long:
         if (!dtsDetected)
             ui->dtsEdit->setText(tr("Detected from module"));
         ui->dtsTypeComboBox->setCurrentIndex(2);
         ui->dtsMagicBytesComboBox->setCurrentIndex(ui->dtsMagicBytesComboBox->findData(data.fd44.dts_long_magic));
-        ui->dtsGroupBox->setEnabled(false);
+        ui->dtsGroupBox->setEnabled(true);
+        ui->dtsTypeComboBox->setEnabled(false);
+        ui->dtsMagicBytesComboBox->setEnabled(false);
+        ui->dtsKeyEdit->setEnabled(true);
+        ui->dtsKeyEdit->setText(data.fd44.dts_key.toHex());
         break;
     }
     opened = data;
@@ -597,7 +613,7 @@ bios_t FD44Editor::readFromUI()
     data.gbe.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
     data.fd44.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
     data.fd44.uuid = QByteArray::fromHex(ui->uuidEdit->text().toAscii());
-    data.fd44.dts_key = data.fd44.uuid.right(DTS_KEY_LENGTH);
+    data.fd44.dts_key = QByteArray::fromHex(ui->dtsKeyEdit->text().toAscii());
     data.fd44.mbsn = ui->mbsnEdit->text().toAscii();
 
     return data;

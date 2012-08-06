@@ -16,13 +16,13 @@ static const char ME_HEADER[] =                                 {'\x20','\x20','
                                                                  '\x00','\x00','\x10','\x00','\x00',
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
-
 // GbE header
 static const char GBE_HEADER[] =                                {'\x00','\x08','\xFF','\xFF','\xD4',
                                                                  '\x00','\xFF','\xFF','\xFF','\xFF',
                                                                  '\xFF','\xFF','\xFF','\xFF','\xC3',
                                                                  '\x10'};
-
+static const char GBE_MAC_STUB[] =                              {'\x88','\x88','\x88','\x88','\x87',
+                                                                 '\x88'};
 // FD44 module structure
 static const char MODULE_HEADER[] =                             {'\x0B','\x82','\x44','\xFD','\xAB',
                                                                  '\xF1','\xC0','\x41','\xAE','\x4E',
