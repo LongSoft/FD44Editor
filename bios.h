@@ -4,6 +4,13 @@
 #include <QByteArray>
 #include "motherboards.h"
 
+// USB BIOS Flashback file header
+static const char UBF_FILE_HEADER[] =							{'\x8B','\xA6','\x3C','\x4A','\x23',
+																 '\x77','\xFB','\x48','\x80','\x3D',
+																 '\x57','\x8C','\xC1','\xFE','\xC4',
+																 '\x4D'};
+static const unsigned int UBF_FILE_HEADER_SIZE = 0x800;
+
 // BOOTEFI marker
 static const char BOOTEFI_HEADER[] =                            {'$','B','O','O','T','E','F','I','$'};
 static const unsigned int BOOTEFI_MAGIC_LENGTH = 3;
@@ -17,10 +24,9 @@ static const char ME_HEADER[] =                                 {'\x20','\x20','
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
 // GbE header
-static const char GBE_HEADER[] =                                {'\x00','\x08','\xFF','\xFF','\xD4',
-                                                                 '\x00','\xFF','\xFF','\xFF','\xFF',
-                                                                 '\xFF','\xFF','\xFF','\xFF','\xC3',
-                                                                 '\x10'};
+static const char GBE_HEADER[] =                                {'\xFF','\xFF','\xFF','\xFF','\xFF',
+																 '\xFF','\xFF','\xFF','\xC3','\x10'};
+static const unsigned int GBE_MAC_OFFSET = 6;
 static const char GBE_MAC_STUB[] =                              {'\x88','\x88','\x88','\x88','\x87',
                                                                  '\x88'};
 // FD44 module structure
@@ -34,9 +40,12 @@ static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
 static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
 static const unsigned int MODULE_HEADER_LENGTH = 36;
 
-static const char MAC_HEADER_X6X[] =                            {'\x0B','\x01','\x0D','\x00'};
-static const char MAC_HEADER_X7X[] =                            {'\x0B','\x01','\x00','\x80','\x09',
+static const char RMAC_HEADER_X6X[] =                           {'\x0B','\x01','\x0D','\x00'};
+static const char RMAC_HEADER_X7X[] =                           {'\x0B','\x01','\x00','\x80','\x09',
                                                                  '\x0D','\x00','\x2D','\x00'};
+static const char AMAC_HEADER_X6X[] =                           {'\x0B','\x00','\x0D','\x00'};
+static const char AMAC_HEADER_X7X[] =                           {'\x0B','\x01','\x00','\x80','\x09',
+                                                                 '\x0D','\x00','\x2A','\x00'};
 static const unsigned int MAC_LENGTH = 6;
 static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
 

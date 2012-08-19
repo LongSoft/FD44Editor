@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>503</height>
+    <height>532</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.5.3.2 beta</string>
+   <string>FD44Editor v0.6.1b</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -206,6 +206,11 @@
          </item>
          <item>
           <property name="text">
+           <string>MAC block and UUID (Atheros)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>UUID only (Any)</string>
           </property>
          </item>
@@ -300,7 +305,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Version 2 (P67-M PRO)</string>
+           <string>Version 2 (P67-M PRO, P67 Sabertooth)</string>
           </property>
          </item>
          <item>
@@ -402,6 +407,16 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="copyButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Copy to clipboard</string>
+      </property>
      </widget>
     </item>
     <item>

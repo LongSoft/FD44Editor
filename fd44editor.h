@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QByteArray>
+#include <QClipboard>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -25,8 +26,9 @@ public:
 private slots:
     void openImageFile();
     void saveImageFile();
+    void copyToClipboard();
     void enableDtsMagicComboBox(int index);
-    void enableSaveButtons();
+    void enableSaveButton();
 
 private:
     Ui::FD44Editor *ui;

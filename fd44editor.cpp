@@ -10,11 +10,12 @@ FD44Editor::FD44Editor(QWidget *parent) :
     // Signal-slot connections
     connect(ui->fromFileButton, SIGNAL(clicked()), this, SLOT(openImageFile()));
     connect(ui->toFileButton, SIGNAL(clicked()), this, SLOT(saveImageFile()));
+    connect(ui->copyButton, SIGNAL(clicked()), this, SLOT(copyToClipboard()));
     connect(ui->dtsTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(enableDtsMagicComboBox(int)));
-    connect(ui->uuidEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
-    connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
-    connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
-    connect(ui->dtsKeyEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButtons()));
+    connect(ui->uuidEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
+    connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
+    connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
+    connect(ui->dtsKeyEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
 
     // Inserting data to dtsMagicBytesComboBox
     ui->dtsMagicBytesComboBox->setItemData(0, QByteArray::fromRawData(DTS_LONG_MAGIC_V1, sizeof(DTS_LONG_MAGIC_V1)));
@@ -76,13 +77,19 @@ void FD44Editor::saveImageFile()
 
     QByteArray bios = outputFile.readAll();
 
+	if(bios.left(sizeof(UBF_FILE_HEADER)) == QByteArray(UBF_FILE_HEADER,sizeof(UBF_FILE_HEADER)))
+	{
+		bios = bios.mid(UBF_FILE_HEADER_SIZE); 
+	}
+
     QByteArray newBios = writeToBIOS(bios, readFromUI());
     if(newBios.isEmpty())
     {
         QMessageBox::critical(this, tr("Fatal error"), tr("Error parsing output file BIOS data.\n%1.").arg(lastError));
         return;
     }
-
+	
+	outputFile.resize(bios.length());
     outputFile.seek(0);
     outputFile.write(newBios);
     outputFile.close();
@@ -90,6 +97,32 @@ void FD44Editor::saveImageFile()
     ui->statusBar->showMessage(tr("Written: %1").arg(fileInfo.fileName()));
 }
 
+void FD44Editor::copyToClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(tr("BIOS information:\n"\
+                          "Motherboard model: %1\n"\
+                          "BIOS version: %2\n"\
+                          "BIOS date: %3\n"\
+                          "LAN status: %4\n"\
+                          "DTS key status: %5\n\n"\
+                          "Primary LAN MAC: %6\n"\
+                          "DTS key type: %7\n"\
+                          "DTS key bytes: %8\n"
+                          "UUID: %9\n"\
+                          "MBSN: %10")
+                       .arg(ui->mbEdit->text())
+                       .arg(ui->versionEdit->text())
+                       .arg(ui->dateEdit->text())
+                       .arg(ui->lanEdit->text())
+                       .arg(ui->dtsEdit->text())
+                       .arg(ui->macEdit->text().remove(':'))
+                       .arg(ui->dtsTypeComboBox->currentText().toLower())
+                       .arg(ui->dtsTypeComboBox->currentIndex() > 0 ? ui->dtsKeyEdit->text().remove(' ') : "-")
+                       .arg(ui->uuidEdit->text().remove(' ').append(ui->macEdit->text().remove(':')))
+                       .arg(ui->mbsnEdit->text())
+                       );
+}
 
 bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
 {
@@ -125,10 +158,10 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     if (pos != -1)
     {
         int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
-        if (pos != pos2 && bios.mid(pos - MAC_LENGTH, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
+        if (pos != pos2 && bios.mid(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
             pos = pos2;
 
-        data.gbe.mac = bios.mid(pos - MAC_LENGTH, MAC_LENGTH);
+        data.gbe.mac = bios.mid(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH);
         data.mac_storage = GbE;
     }
 
@@ -184,10 +217,11 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     }
 
     // Data format setup
-    QByteArray macHeader, shortDtsHeader, longDtsHeader, uuidHeader, mbsnHeader;
+    QByteArray rMacHeader, aMacHeader, shortDtsHeader, longDtsHeader, uuidHeader, mbsnHeader;
     if (data.fd44.version == x6x)
     {
-        macHeader = QByteArray::fromRawData(MAC_HEADER_X6X, sizeof(MAC_HEADER_X6X));
+        rMacHeader = QByteArray::fromRawData(RMAC_HEADER_X6X, sizeof(RMAC_HEADER_X6X));
+		aMacHeader = QByteArray::fromRawData(AMAC_HEADER_X6X, sizeof(AMAC_HEADER_X6X));
         shortDtsHeader = QByteArray::fromRawData(DTS_SHORT_HEADER_X6X, sizeof(DTS_SHORT_HEADER_X6X));
         longDtsHeader = QByteArray::fromRawData(DTS_LONG_HEADER_X6X, sizeof(DTS_LONG_HEADER_X6X));
         uuidHeader = QByteArray::fromRawData(UUID_HEADER_X6X, sizeof(UUID_HEADER_X6X));
@@ -195,20 +229,30 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     }
     else if (data.fd44.version == x7x)
     {
-        macHeader = QByteArray::fromRawData(MAC_HEADER_X7X, sizeof(MAC_HEADER_X7X));
+        rMacHeader = QByteArray::fromRawData(RMAC_HEADER_X7X, sizeof(RMAC_HEADER_X7X));
+		aMacHeader = QByteArray::fromRawData(AMAC_HEADER_X7X, sizeof(AMAC_HEADER_X7X));
         shortDtsHeader = QByteArray::fromRawData(DTS_SHORT_HEADER_X7X, sizeof(DTS_SHORT_HEADER_X7X));
         longDtsHeader = QByteArray::fromRawData(DTS_LONG_HEADER_X7X, sizeof(DTS_LONG_HEADER_X7X));
         uuidHeader = QByteArray::fromRawData(UUID_HEADER_X7X, sizeof(UUID_HEADER_X7X));
         mbsnHeader = QByteArray::fromRawData(MBSN_HEADER_X7X, sizeof(MBSN_HEADER_X7X));
     }
 
-    // Searching for MAC block
-    pos = moduleBody.lastIndexOf(macHeader);
+	// Searching for Atheros MAC block
+	pos = moduleBody.lastIndexOf(aMacHeader);
+    if (pos != -1)
+	{
+		data.mac_storage = AMAC;
+        data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + aMacHeader.length(), MAC_ASCII_LENGTH));
+	}
+
+    // Searching for Realtek MAC block
+    pos = moduleBody.lastIndexOf(rMacHeader);
     if (pos != -1)
     {
-        data.mac_storage = MAC;
-        data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + macHeader.length(), MAC_ASCII_LENGTH));
+        data.mac_storage = RMAC;
+        data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + rMacHeader.length(), MAC_ASCII_LENGTH));
     }
+
     // Searching for DTS block
     data.dts_type = None;
     // Short DTS
@@ -349,10 +393,11 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     }
 
     // Data format setup
-    QByteArray macHeader, shortDtsHeader, longDtsHeader, uuidHeader, mbsnHeader;
+    QByteArray rMacHeader, aMacHeader, shortDtsHeader, longDtsHeader, uuidHeader, mbsnHeader, macHeaderSuffix;
     if (data.fd44.version == x6x)
     {
-        macHeader = QByteArray::fromRawData(MAC_HEADER_X6X, sizeof(MAC_HEADER_X6X));
+        rMacHeader = QByteArray::fromRawData(RMAC_HEADER_X6X, sizeof(RMAC_HEADER_X6X));
+		aMacHeader = QByteArray::fromRawData(RMAC_HEADER_X6X, sizeof(AMAC_HEADER_X6X));
         shortDtsHeader = QByteArray::fromRawData(DTS_SHORT_HEADER_X6X, sizeof(DTS_SHORT_HEADER_X6X));
         longDtsHeader = QByteArray::fromRawData(DTS_LONG_HEADER_X6X, sizeof(DTS_LONG_HEADER_X6X));
         uuidHeader = QByteArray::fromRawData(UUID_HEADER_X6X, sizeof(UUID_HEADER_X6X));
@@ -360,7 +405,8 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     }
     else if (data.fd44.version == x7x)
     {
-        macHeader = QByteArray::fromRawData(MAC_HEADER_X7X, sizeof(MAC_HEADER_X7X));
+        rMacHeader = QByteArray::fromRawData(RMAC_HEADER_X7X, sizeof(RMAC_HEADER_X7X));
+		aMacHeader = QByteArray::fromRawData(AMAC_HEADER_X7X, sizeof(AMAC_HEADER_X7X));
         shortDtsHeader = QByteArray::fromRawData(DTS_SHORT_HEADER_X7X, sizeof(DTS_SHORT_HEADER_X7X));
         longDtsHeader = QByteArray::fromRawData(DTS_LONG_HEADER_X7X, sizeof(DTS_LONG_HEADER_X7X));
         uuidHeader = QByteArray::fromRawData(UUID_HEADER_X7X, sizeof(UUID_HEADER_X7X));
@@ -368,15 +414,25 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     }
 
     QByteArray module;
+
     // Realtek MAC
-    if(data.mac_storage == MAC)
+    if(data.mac_storage == RMAC)
     {
-        module.append(macHeader);
+        module.append(rMacHeader);
         QByteArray encodedMac = data.fd44.mac.toHex().toUpper();
         module.append(encodedMac);
         module.append('\x00');
     }
-
+	
+	// Atheros MAC
+	if(data.mac_storage == AMAC)
+    {
+        module.append(aMacHeader);
+        QByteArray encodedMac = data.fd44.mac.toHex().toUpper();
+        module.append(encodedMac);
+        module.append('\x00');
+    }
+	
     // Short DTS key
     if(data.dts_type == Short)
     {
@@ -446,11 +502,10 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
         return QByteArray();
     }
 
-    newBios.replace(pos - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
-    newBios.replace(pos2 - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
+    newBios.replace(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH, data.gbe.mac);
+    newBios.replace(pos2 - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH, data.gbe.mac);
     return newBios;
 }
-
 
 void FD44Editor::writeToUI(bios_t data)
 {
@@ -470,6 +525,7 @@ void FD44Editor::writeToUI(bios_t data)
     ui->uuidGroupBox->setEnabled(true);
     ui->mbsnGroupBox->setEnabled(true);
     ui->macGroupBox->setEnabled(true);
+    ui->copyButton->setEnabled(true);
 
     ui->mbEdit->setText(data.be.motherboard_name);
     ui->versionEdit->setText(QString("%1%2").arg((int)data.be.bios_version.at(0),2,10,QChar('0')).arg((int)data.be.bios_version.at(1),2,10,QChar('0')));
@@ -512,18 +568,25 @@ void FD44Editor::writeToUI(bios_t data)
         ui->lanComboBox->setCurrentIndex(0);
         ui->macEdit->setText(data.gbe.mac.toHex());
         break;
-    case MAC:
+    case RMAC:
         if (!lanDetected)
             ui->lanEdit->setText(tr("Detected from module"));
         ui->lanComboBox->setEnabled(false);
         ui->lanComboBox->setCurrentIndex(1);
         ui->macEdit->setText(data.fd44.mac.toHex());
         break;
-    case UUID:
+	case AMAC:
         if (!lanDetected)
             ui->lanEdit->setText(tr("Detected from module"));
         ui->lanComboBox->setEnabled(false);
         ui->lanComboBox->setCurrentIndex(2);
+        ui->macEdit->setText(data.fd44.mac.toHex());
+        break;
+    case UUID:
+        if (!lanDetected)
+            ui->lanEdit->setText(tr("Detected from module"));
+        ui->lanComboBox->setEnabled(false);
+        ui->lanComboBox->setCurrentIndex(3);
         ui->macEdit->setText(data.fd44.mac.toHex());
         break;
     }
@@ -604,9 +667,12 @@ bios_t FD44Editor::readFromUI()
             data.mac_storage = GbE;
             break;
         case 1:
-            data.mac_storage = MAC;
+            data.mac_storage = RMAC;
             break;
-        case 2:
+		case 2:
+            data.mac_storage = AMAC;
+            break;
+        case 3:
             data.mac_storage = UUID;
             break;
         }
@@ -620,7 +686,7 @@ bios_t FD44Editor::readFromUI()
     return data;
 }
 
-void FD44Editor::enableSaveButtons()
+void FD44Editor::enableSaveButton()
 {
     if (ui->uuidEdit->text().length() == ui->uuidEdit->maxLength()
         && ui->macEdit->text().length() == ui->macEdit->maxLength()
