@@ -58,7 +58,7 @@ void FD44Editor::openImageFile()
 
 void FD44Editor::saveImageFile()
 {
-    QString path = QFileDialog::getSaveFileName(this, tr("Save BIOS image file"),".","BIOS image file (*.rom *.bin *.cap)");
+    QString path = QFileDialog::getSaveFileName(this, tr("Save BIOS image file"),".","BIOS image file (*.rom *.bin *.cap);;All files (*.*)");
 
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
@@ -90,11 +90,12 @@ void FD44Editor::saveImageFile()
     }
 	
 	outputFile.resize(bios.length());
-    outputFile.seek(0);
+	outputFile.seek(0);
     outputFile.write(newBios);
     outputFile.close();
+	outputFile.rename(QString("%1/%2.bin").arg(fileInfo.path()).arg(fileInfo.completeBaseName()));
 
-    ui->statusBar->showMessage(tr("Written: %1").arg(fileInfo.fileName()));
+    ui->statusBar->showMessage(tr("Written: %1.bin").arg(fileInfo.completeBaseName()));
 }
 
 void FD44Editor::copyToClipboard()
@@ -154,7 +155,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         isFull = true;
 
     // Detecting primary LAN MAC storage
-    pos = bios.indexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
+	pos = bios.indexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
     if (pos != -1)
     {
         int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
@@ -239,7 +240,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
 
 	// Searching for Atheros MAC block
 	pos = moduleBody.lastIndexOf(aMacHeader);
-    if (pos != -1)
+	if (data.mac_storage != GbE && pos != -1)
 	{
 		data.mac_storage = AMAC;
         data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + aMacHeader.length(), MAC_ASCII_LENGTH));
@@ -247,7 +248,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
 
     // Searching for Realtek MAC block
     pos = moduleBody.lastIndexOf(rMacHeader);
-    if (pos != -1)
+    if (data.mac_storage != GbE && pos != -1)
     {
         data.mac_storage = RMAC;
         data.fd44.mac = QByteArray::fromHex(moduleBody.mid(pos + rMacHeader.length(), MAC_ASCII_LENGTH));
@@ -363,6 +364,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     data.state = Valid;
     return data;
 }
+
 QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
 {
     int pos = bios.lastIndexOf(QByteArray::fromRawData(MODULE_HEADER, sizeof(MODULE_HEADER)));
