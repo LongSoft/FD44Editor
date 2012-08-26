@@ -6,9 +6,9 @@
 
 // USB BIOS Flashback file header
 static const char UBF_FILE_HEADER[] =							{'\x8B','\xA6','\x3C','\x4A','\x23',
-																 '\x77','\xFB','\x48','\x80','\x3D',
-																 '\x57','\x8C','\xC1','\xFE','\xC4',
-																 '\x4D'};
+                                                                 '\x77','\xFB','\x48','\x80','\x3D',
+                                                                 '\x57','\x8C','\xC1','\xFE','\xC4',
+                                                                 '\x4D'};
 static const unsigned int UBF_FILE_HEADER_SIZE = 0x800;
 
 // BOOTEFI marker
@@ -23,12 +23,17 @@ static const char ME_HEADER[] =                                 {'\x20','\x20','
                                                                  '\x00','\x00','\x10','\x00','\x00',
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
+static const char ME_VERSION_HEADER[] =                         {'\x24','\x4D','\x4E','\x32','\x02',
+                                                                 '\x00','\x00','\x00'};               
+static const unsigned int ME_VERSION_LENGTH = 8;
+
 // GbE header
 static const char GBE_HEADER[] =                                {'\xFF','\xFF','\xFF','\xFF','\xFF',
-																 '\xFF','\xFF','\xFF','\xC3','\x10'};
+                                                                 '\xFF','\xFF','\xFF','\xC3','\x10'};
 static const unsigned int GBE_MAC_OFFSET = 6;
 static const char GBE_MAC_STUB[] =                              {'\x88','\x88','\x88','\x88','\x87',
                                                                  '\x88'};
+
 // FD44 module structure
 static const char MODULE_HEADER[] =                             {'\x0B','\x82','\x44','\xFD','\xAB',
                                                                  '\xF1','\xC0','\x41','\xAE','\x4E',
@@ -107,7 +112,13 @@ typedef struct {
 } bootefi_t;
 
 typedef struct {
+    QByteArray me_version;
+    //QByteArray me_image;
+} me_t;
+
+typedef struct {
     QByteArray mac;
+    //QByteArray gbe_version;
 } gbe_t;
 
 enum fd44_version_e
@@ -134,6 +145,7 @@ enum bios_state_e
 
 typedef struct {
     bootefi_t be;
+    me_t me;
     gbe_t gbe;
     fd44_t fd44;
     dts_e dts_type;

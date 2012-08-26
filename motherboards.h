@@ -15,12 +15,12 @@ typedef struct {
 
 static const motherboard_t MB_FEATURE_LIST[] = {
     // H61
-	{"P8H61-M-LE", RMAC, None},
+    {"P8H61-M-LE", RMAC, None},
 
-	// P67
+    // P67
     {"MaximusIV-Extreme", GbE, None},
     {"P8P67", UUID, Short},
-	{"P8P67-REV31", UUID, Short},
+    {"P8P67-REV31", UUID, Short},
     {"P8P67-DELUXE", GbE, Long},
     {"P8P67-EVO", GbE, Short},
     {"P8P67-LE", RMAC, Short},
@@ -44,10 +44,10 @@ static const motherboard_t MB_FEATURE_LIST[] = {
     {"P8Z68-V-PRO", GbE, Short},
     {"P8Z68-V-PRO-GEN3", GbE, Short},
 
-	// H77
-	{"P8H77-V", AMAC, None},
+    // H77
+    {"P8H77-V", AMAC, None},
 
-	// Z77
+    // Z77
     {"MAXIMUS-V-FORMULA", GbE, None},
     {"MAXIMUS-V-GENE", GbE, None},
     //{"P8Z77-I-DELUXE", GbE, Long},
