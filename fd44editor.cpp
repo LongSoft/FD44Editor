@@ -150,15 +150,15 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     pos += BOOTEFI_MOTHERBOARD_NAME_LENGTH + BOOTEFI_BIOS_DATE_OFFSET;
     data.be.bios_date = bios.mid(pos, BOOTEFI_BIOS_DATE_LENGTH);
 
-    // Detecting ME presence
+    // Detecting ME presence and version
     bool isFull = false;
     pos = bios.indexOf(QByteArray::fromRawData(ME_HEADER, sizeof(ME_HEADER)));
     if (pos != -1)
     {
-        pos = bios.indexOf(QByteArray::fromRawData(ME_VERSION_HEADER, sizeof(ME_VERSION_HEADER)));
+        pos = bios.indexOf(QByteArray::fromRawData(ME_VERSION_HEADER, sizeof(ME_VERSION_HEADER)), pos);
         if (pos != -1)
         {
-            data.me.me_version = bios.mid(pos + sizeof(ME_VERSION_HEADER), ME_VERSION_LENGTH);
+            data.me.me_version = bios.mid(pos + ME_VERSION_OFFSET + sizeof(ME_VERSION_HEADER), ME_VERSION_LENGTH);
         }
         isFull = true;
     }

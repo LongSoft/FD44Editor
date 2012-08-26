@@ -23,8 +23,8 @@ static const char ME_HEADER[] =                                 {'\x20','\x20','
                                                                  '\x00','\x00','\x10','\x00','\x00',
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
-static const char ME_VERSION_HEADER[] =                         {'\x24','\x4D','\x4E','\x32','\x02',
-                                                                 '\x00','\x00','\x00'};               
+static const char ME_VERSION_HEADER[] =                         {'\x24','\x4D','\x4E','\x32'};
+static const unsigned int ME_VERSION_OFFSET = 4;
 static const unsigned int ME_VERSION_LENGTH = 8;
 
 // GbE header
