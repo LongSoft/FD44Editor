@@ -521,8 +521,8 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
         return QByteArray();
     }
 
-    newBios.replace(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH, data.gbe.mac);
-    newBios.replace(pos2 - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH, data.gbe.mac);
+    newBios.replace(pos + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
+    newBios.replace(pos2 + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH, data.gbe.mac);
     return newBios;
 }
 
