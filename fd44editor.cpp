@@ -103,20 +103,22 @@ void FD44Editor::copyToClipboard()
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(tr("BIOS information:\n"\
                           "Motherboard model: %1\n"\
-                          "BIOS version: %2\n"\
-                          "BIOS date: %3\n"\
+                          "BIOS date: %2\n"\
+                          "BIOS version: %3\n"\
                           "ME version: %4\n"\
-                          "LAN status: %5\n"\
-                          "DTS key status: %6\n\n"\
-                          "Primary LAN MAC: %7\n"\
-                          "DTS key type: %8\n"\
-                          "DTS key bytes: %9\n"
-                          "UUID: %10\n"\
+                          "GbE version: %5\n"\
+                          "LAN status: %6\n"\
+                          "DTS key status: %7\n\n"\
+                          "Primary LAN MAC: %8\n"\
+                          "DTS key type: %9\n"\
+                          "DTS key bytes: %10\n"
+                          "UUID: %11\n"\
                           "MBSN: %11")
                        .arg(ui->mbEdit->text())
-                       .arg(ui->biosVersionEdit->text())
                        .arg(ui->dateEdit->text())
+                       .arg(ui->biosVersionEdit->text())
                        .arg(ui->meVersionEdit->text())
+                       .arg(ui->gbeVersionEdit->text())
                        .arg(ui->lanEdit->text())
                        .arg(ui->dtsEdit->text())
                        .arg(ui->macEdit->text().remove(':'))
@@ -158,12 +160,16 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         pos = bios.indexOf(QByteArray::fromRawData(ME_VERSION_HEADER, sizeof(ME_VERSION_HEADER)), pos);
         if (pos != -1)
         {
-            data.me.me_version = bios.mid(pos + ME_VERSION_OFFSET + sizeof(ME_VERSION_HEADER), ME_VERSION_LENGTH);
+            data.me.me_version = bios.mid(pos + sizeof(ME_VERSION_HEADER) + ME_VERSION_OFFSET, ME_VERSION_LENGTH);
+        }
+        else
+        {
+            data.me.me_version = QByteArray(" ");
         }
         isFull = true;
     }
 
-    // Detecting primary LAN MAC storage
+    // Detecting GbE presence and version
     pos = bios.indexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
     if (pos != -1)
     {
@@ -171,8 +177,10 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         if (pos != pos2 && bios.mid(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
             pos = pos2;
 
-        data.gbe.mac = bios.mid(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH);
+        data.gbe.mac = bios.mid(pos + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH);
         data.mac_storage = GbE;
+
+        data.gbe.gbe_version = bios.mid(pos + GBE_VERSION_OFFSET, GBE_VERSION_LENGTH);
     }
 
     // Searching for non-empty module
@@ -542,16 +550,33 @@ void FD44Editor::writeToUI(bios_t data)
     ui->biosVersionEdit->setText(QString("%1%2").arg((int)data.be.bios_version.at(0),2,10,QChar('0')).arg((int)data.be.bios_version.at(1),2,10,QChar('0')));
     ui->dateEdit->setText(data.be.bios_date);
 
+    // ME version
     if (!data.me.me_version.isEmpty())
     {
-        qint16 major = *(qint16*)(const void*)(data.me.me_version.mid(0, 2));
-        qint16 minor = *(qint16*)(const void*)(data.me.me_version.mid(2, 2));
-        qint16 bugfix = *(qint16*)(const void*)(data.me.me_version.mid(4, 2));
-        qint16 build = *(qint16*)(const void*)(data.me.me_version.mid(6, 2));
-        ui->meVersionEdit->setText(QString("%1.%2.%3.%4").arg(major).arg(minor).arg(bugfix).arg(build));
+        if(data.me.me_version.length() == ME_VERSION_LENGTH)
+        {
+            qint16 major = *(qint16*)(const void*)(data.me.me_version.mid(0, 2));
+            qint16 minor = *(qint16*)(const void*)(data.me.me_version.mid(2, 2));
+            qint16 bugfix = *(qint16*)(const void*)(data.me.me_version.mid(4, 2));
+            qint16 build = *(qint16*)(const void*)(data.me.me_version.mid(6, 2));
+            ui->meVersionEdit->setText(QString("%1.%2.%3.%4").arg(major).arg(minor).arg(bugfix).arg(build));
+        }
+        else
+            ui->meVersionEdit->setText(tr("Not detected"));
     }
     else
-        ui->meVersionEdit->setText("Not detected");
+        ui->meVersionEdit->setText("Not present");
+
+    //GbE version
+    if (!data.gbe.gbe_version.isEmpty())
+    {
+        quint8 major = data.gbe.gbe_version.at(1);
+        quint8 minor = data.gbe.gbe_version.at(0) >> 4 & 0x0F;
+        //quint8 image_id = data.gbe.gbe_version.at(0) & 0x0F;
+        ui->gbeVersionEdit->setText(QString("%1.%2").arg(major).arg(minor));
+    }
+    else
+        ui->gbeVersionEdit->setText(tr("Not present"));
 
     // List-based detection
     // LAN type detection

@@ -30,9 +30,11 @@ static const unsigned int ME_VERSION_LENGTH = 8;
 // GbE header
 static const char GBE_HEADER[] =                                {'\xFF','\xFF','\xFF','\xFF','\xFF',
                                                                  '\xFF','\xFF','\xFF','\xC3','\x10'};
-static const unsigned int GBE_MAC_OFFSET = 6;
+static const int GBE_MAC_OFFSET = -6;
 static const char GBE_MAC_STUB[] =                              {'\x88','\x88','\x88','\x88','\x87',
                                                                  '\x88'};
+static const int GBE_VERSION_OFFSET = -2;
+static const unsigned int GBE_VERSION_LENGTH = 2;
 
 // FD44 module structure
 static const char MODULE_HEADER[] =                             {'\x0B','\x82','\x44','\xFD','\xAB',
@@ -118,7 +120,7 @@ typedef struct {
 
 typedef struct {
     QByteArray mac;
-    //QByteArray gbe_version;
+    QByteArray gbe_version;
 } gbe_t;
 
 enum fd44_version_e

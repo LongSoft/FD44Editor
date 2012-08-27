@@ -51,7 +51,7 @@ static const motherboard_t MB_FEATURE_LIST[] = {
     {"MAXIMUS-V-FORMULA", GbE, None},
     {"MAXIMUS-V-GENE", GbE, None},
     //{"P8Z77-I-DELUXE", GbE, Long},
-    //{"P8Z77-M", RMAC, Short},
+    //{"P8Z77-M", RMAC, None},
     {"P8Z77-M-PRO", UUID, None},
     {"P8Z77-V", GbE, None},
     {"P8Z77-V-DELUXE", GbE, None},
@@ -60,7 +60,7 @@ static const motherboard_t MB_FEATURE_LIST[] = {
     //{"P8Z77-V-LK", RMAC, None},
     //{"P8Z77-V-PREMIUM", GbE, Long},
     {"P8Z77-V-PRO", GbE, None},
-    //{"P8Z77-V-PRO-THUNDERBOLT", GbE, Short},
+    //{"P8Z77-V-PRO-THUNDERBOLT", GbE, None},
     {"P8Z77-WS", UUID, Long},
     {"SABERTOOTH-Z77", GbE, None},
 };

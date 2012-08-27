@@ -20,3 +20,6 @@ HEADERS  += fd44editor.h \
     motherboards.h
 
 FORMS    += fd44editor.ui
+
+OTHER_FILES += \
+    TODO.txt
