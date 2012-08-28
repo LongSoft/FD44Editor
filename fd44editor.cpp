@@ -122,7 +122,7 @@ void FD44Editor::copyToClipboard()
                        .arg(ui->lanEdit->text())
                        .arg(ui->dtsEdit->text())
                        .arg(ui->macEdit->text().remove(':'))
-                       .arg(ui->dtsTypeComboBox->currentText().toLower())
+                       .arg(ui->dtsTypeComboBox->currentText())
                        .arg(ui->dtsTypeComboBox->currentIndex() > 0 ? ui->dtsKeyEdit->text().remove(' ') : "-")
                        .arg(ui->uuidEdit->text().remove(' ').append(ui->macEdit->text().remove(':')))
                        .arg(ui->mbsnEdit->text())
@@ -174,7 +174,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
     if (pos != -1)
     {
         int pos2 = bios.lastIndexOf(QByteArray::fromRawData(GBE_HEADER, sizeof(GBE_HEADER)));
-        if (pos != pos2 && bios.mid(pos - MAC_LENGTH - GBE_MAC_OFFSET, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
+        if (pos != pos2 && bios.mid(pos + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH) == QByteArray(GBE_MAC_STUB, sizeof(GBE_MAC_STUB)))
             pos = pos2;
 
         data.gbe.mac = bios.mid(pos + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH);
@@ -517,7 +517,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & bios, const bios_t & data)
     int pos2 = newBios.lastIndexOf(QByteArray(GBE_HEADER, sizeof(GBE_HEADER)));
     if (pos == -1)
     {
-        lastError = tr("GbE region not found in target file. \nPlease use full BIOS backup or factory BIOS File.");
+        lastError = tr("GbE region not found in target file. \nPlease use full BIOS backup or factory BIOS file.");
         return QByteArray();
     }
 
