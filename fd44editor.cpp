@@ -113,7 +113,7 @@ void FD44Editor::copyToClipboard()
                           "DTS key type: %9\n"\
                           "DTS key bytes: %10\n"
                           "UUID: %11\n"\
-                          "MBSN: %11")
+                          "MBSN: %12")
                        .arg(ui->mbEdit->text())
                        .arg(ui->dateEdit->text())
                        .arg(ui->biosVersionEdit->text())
@@ -225,7 +225,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & bios)
         if (moduleBody.count('\xFF') != moduleBody.size())
             isEmpty = false;
         else
-            pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER, sizeof(MODULE_HEADER)), pos);
+            pos = bios.indexOf(QByteArray::fromRawData(MODULE_HEADER, sizeof(MODULE_HEADER)), pos+1);
     }
 
     if (isEmpty)
