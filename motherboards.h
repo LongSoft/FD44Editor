@@ -5,7 +5,7 @@
 
 enum mac_storage_e {UnknownStorage, GbE, RMAC, AMAC, UUID};
 enum dts_e {UnknownDts, None, Short, Long};
-static const unsigned int BOOTEFI_MOTHERBOARD_NAME_LENGTH = 60;
+#define BOOTEFI_MOTHERBOARD_NAME_LENGTH 60
 
 typedef struct {
     char name[BOOTEFI_MOTHERBOARD_NAME_LENGTH];

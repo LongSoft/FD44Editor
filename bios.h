@@ -9,14 +9,14 @@ static const char UBF_FILE_HEADER[] =							{'\x8B','\xA6','\x3C','\x4A','\x23',
                                                                  '\x77','\xFB','\x48','\x80','\x3D',
                                                                  '\x57','\x8C','\xC1','\xFE','\xC4',
                                                                  '\x4D'};
-static const unsigned int UBF_FILE_HEADER_SIZE = 0x800;
+#define UBF_FILE_HEADER_SIZE 0x800
 
 // BOOTEFI marker
 static const char BOOTEFI_HEADER[] =                            {'$','B','O','O','T','E','F','I','$'};
-static const unsigned int BOOTEFI_MAGIC_LENGTH = 3;
-static const unsigned int BOOTEFI_BIOS_VERSION_LENGTH = 2;
-static const unsigned int BOOTEFI_BIOS_DATE_OFFSET = 21;
-static const unsigned int BOOTEFI_BIOS_DATE_LENGTH = 10;
+#define BOOTEFI_MAGIC_LENGTH 3
+#define BOOTEFI_BIOS_VERSION_LENGTH 2
+#define BOOTEFI_BIOS_DATE_OFFSET 21
+#define BOOTEFI_BIOS_DATE_LENGTH 10
 
 // ME header
 static const char ME_HEADER[] =                                 {'\x20','\x20','\x80','\x0F','\x40',
@@ -24,17 +24,17 @@ static const char ME_HEADER[] =                                 {'\x20','\x20','
                                                                  '\x00','\x00','\x00','\x00','\x00',
                                                                  '\x00'};
 static const char ME_VERSION_HEADER[] =                         {'\x24','\x4D','\x4E','\x32'};
-static const unsigned int ME_VERSION_OFFSET = 4;
-static const unsigned int ME_VERSION_LENGTH = 8;
+#define ME_VERSION_OFFSET 4
+#define ME_VERSION_LENGTH 8
 
 // GbE header
 static const char GBE_HEADER[] =                                {'\xFF','\xFF','\xFF','\xFF','\xFF',
                                                                  '\xFF','\xFF','\xFF','\xC3','\x10'};
-static const int GBE_MAC_OFFSET = -6;
+#define GBE_MAC_OFFSET (-6)
 static const char GBE_MAC_STUB[] =                              {'\x88','\x88','\x88','\x88','\x87',
                                                                  '\x88'};
-static const int GBE_VERSION_OFFSET = -2;
-static const unsigned int GBE_VERSION_LENGTH = 2;
+#define GBE_VERSION_OFFSET (-2)
+#define GBE_VERSION_LENGTH 2
 
 // FD44 module structure
 static const char MODULE_HEADER[] =                             {'\x0B','\x82','\x44','\xFD','\xAB',
@@ -43,9 +43,9 @@ static const char MODULE_HEADER[] =                             {'\x0B','\x82','
                                                                  '\xBD'};
 static const char MODULE_VERSION_X6X[] =                        {'\xD3'};
 static const char MODULE_VERSION_X7X[] =                        {'\xCD'};
-static const unsigned int MODULE_HEADER_BSA_OFFSET = 28;
+#define MODULE_HEADER_BSA_OFFSET 28
 static const char MODULE_HEADER_BSA[] =                         {'B', 'S', 'A', '_'};
-static const unsigned int MODULE_HEADER_LENGTH = 36;
+#define MODULE_HEADER_LENGTH 36
 
 static const char RMAC_HEADER_X6X[] =                           {'\x0B','\x01','\x0D','\x00'};
 static const char RMAC_HEADER_X7X[] =                           {'\x0B','\x01','\x00','\x80','\x09',
@@ -53,10 +53,10 @@ static const char RMAC_HEADER_X7X[] =                           {'\x0B','\x01','
 static const char AMAC_HEADER_X6X[] =                           {'\x0B','\x00','\x0D','\x00'};
 static const char AMAC_HEADER_X7X[] =                           {'\x0B','\x01','\x00','\x80','\x09',
                                                                  '\x0D','\x00','\x2A','\x00'};
-static const unsigned int MAC_LENGTH = 6;
-static const unsigned int MAC_ASCII_LENGTH = 2*MAC_LENGTH + 1;
+#define MAC_LENGTH 6
+#define MAC_ASCII_LENGTH 13
 
-static const unsigned int DTS_KEY_LENGTH = 8;
+#define DTS_KEY_LENGTH 8
 static const char DTS_SHORT_HEADER_X6X[] =                      {'\x8B','\x04','\x26','\x00'};
 static const char DTS_SHORT_HEADER_X7X[] =                      {'\x8B','\x04','\xAA','\xBB'};
 static const char DTS_SHORT_PART2[] =                           {'\x04','\x04','\x32','\x55','\xF8',
@@ -97,14 +97,14 @@ static const char DTS_LONG_PART4[] =                            {'\x04','\x00','
 static const char UUID_HEADER_X6X[] =                           {'\x01','\x08','\x10','\x00'};
 static const char UUID_HEADER_X7X[] =                           {'\x01','\x08','\x00','\x80','\x09',
                                                                  '\x10','\x00','\x01','\x00'};
-static const unsigned int UUID_LENGTH = 16;
+#define UUID_LENGTH 16
 
 static const char MBSN_HEADER_X6X[] =                           {'\x02','\x07','\x10','\x00'};
 static const char MBSN_HEADER_X7X[] =                           {'\x02','\x07','\x00','\x80','\x09',
                                                                  '\x10','\x00','\x02','\x00'};
-static const unsigned int MBSN_BODY_LENGTH = 16;
+#define MBSN_BODY_LENGTH 16
 
-static const unsigned int MODULE_LENGTH = 552;
+#define MODULE_LENGTH 552
 
 // BIOS data structures
 typedef struct {
