@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>295</width>
-    <height>556</height>
+    <width>284</width>
+    <height>433</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.6.8b</string>
+   <string>FD44Editor v0.7.0b</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -27,12 +27,6 @@
     </sizepolicy>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>4</number>
-    </property>
-    <property name="margin">
-     <number>4</number>
-    </property>
     <item>
      <widget class="QPushButton" name="fromFileButton">
       <property name="text">
@@ -46,9 +40,12 @@
        <bool>true</bool>
       </property>
       <property name="title">
-       <string>Detected BIOS information</string>
+       <string>BIOS information</string>
       </property>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <property name="horizontalSpacing">
         <number>4</number>
        </property>
@@ -61,7 +58,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="mbLabel">
          <property name="text">
-          <string>Motherboard</string>
+          <string>Motherboard:</string>
          </property>
         </widget>
        </item>
@@ -84,7 +81,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>BIOS date</string>
+          <string>BIOS date:</string>
          </property>
         </widget>
        </item>
@@ -107,7 +104,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>BIOS version</string>
+          <string>BIOS version:</string>
          </property>
         </widget>
        </item>
@@ -130,7 +127,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>ME version</string>
+          <string>ME version:</string>
          </property>
         </widget>
        </item>
@@ -153,7 +150,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>GbE version</string>
+          <string>GbE version:</string>
          </property>
         </widget>
        </item>
@@ -176,7 +173,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>LAN status</string>
+          <string>MAC status:</string>
          </property>
         </widget>
        </item>
@@ -199,7 +196,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>DTS key status</string>
+          <string>DTS key status:     </string>
          </property>
         </widget>
        </item>
@@ -217,59 +214,29 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="macGroupBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
+     <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string> Primary LAN card</string>
+       <string>Editable data</string>
       </property>
-      <layout class="QFormLayout" name="formLayout_2">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
-       <property name="horizontalSpacing">
-        <number>4</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>4</number>
-       </property>
+      <layout class="QGridLayout" name="gridLayout">
        <property name="margin">
         <number>4</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lanTypeLabel">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Storage</string>
+          <string>Primary card MAC:</string>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="lanComboBox">
-         <item>
-          <property name="text">
-           <string>GbE region and UUID (Intel)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MAC block and UUID (Realtek)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MAC block and UUID (Atheros)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>UUID only (Any)</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="macEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="inputMask">
           <string>&gt;HH:HH:HH:HH:HH:HH;_</string>
          </property>
@@ -281,101 +248,18 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="macLabel">
-         <property name="text">
-          <string>MAC</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="dtsGroupBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="title">
-       <string>DTS key</string>
-      </property>
-      <layout class="QFormLayout" name="formLayout_3">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
-       <property name="horizontalSpacing">
-        <number>4</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>4</number>
-       </property>
-       <property name="margin">
-        <number>4</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="dtsTypeLabel">
-         <property name="text">
-          <string>Type</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="dtsTypeComboBox">
-         <item>
-          <property name="text">
-           <string>None</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Short</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Long</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="dtsMagicBytesLabel">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Magic bytes</string>
+          <string>DTS key:</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="dtsMagicBytesComboBox">
+        <widget class="QLineEdit" name="dtsKeyEdit">
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <item>
-          <property name="text">
-           <string>Version 1 (Default)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Version 2 (P67-M PRO, P67 Sabertooth)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Version 3 (P67 WS Revolution)</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Key bytes</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="dtsKeyEdit">
          <property name="inputMask">
           <string>&gt;HH HH HH HH HH HH HH HH;_</string>
          </property>
@@ -390,26 +274,18 @@
          </property>
         </widget>
        </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="uuidGroupBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="title">
-       <string>System UUID (10 significant bytes)</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="margin">
-        <number>4</number>
-       </property>
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <item row="0" column="0">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>System UUID:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
         <widget class="QLineEdit" name="uuidEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="inputMask">
           <string>&gt;HH HH HH HH HH HH HH HH HH HH;_</string>
          </property>
@@ -424,26 +300,18 @@
          </property>
         </widget>
        </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="mbsnGroupBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="title">
-       <string>Motherboard Serial Number</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <property name="margin">
-        <number>4</number>
-       </property>
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <item row="0" column="2" colspan="2">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Motherboard S/N:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
         <widget class="QLineEdit" name="mbsnEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="inputMask">
           <string>NNNNNNNNNNNNNNN;_</string>
          </property>

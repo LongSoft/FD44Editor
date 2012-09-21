@@ -1,70 +1,294 @@
 #ifndef MOTHERBOARDS_H
 #define MOTHERBOARDS_H
 
-#include <QByteArray>
+#include "bios.h"
 
-enum mac_storage_e {UnknownStorage, GbE, RMAC, AMAC, UUID};
-enum dts_e {UnknownDts, None, Short, Long};
-#define BOOTEFI_MOTHERBOARD_NAME_LENGTH 60
-
-typedef struct {
-    char name[BOOTEFI_MOTHERBOARD_NAME_LENGTH];
-    mac_storage_e mac_storage;
-    dts_e dts_type;
-} motherboard_t;
-
-static const motherboard_t MB_FEATURE_LIST[] = {
+const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] = 
+{
     // H61
-    {"P8H61-M-LE", RMAC, None},
+    {
+        "P8H61-M-LE", 
+        MODULE_VERSION_6_SERIES,
+        ASCII, REALTEK_MAC_HEADER_6_SERIES,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },
 
     // P67
-    {"MaximusIV-Extreme", GbE, None},
-    {"P8P67", UUID, Short},
-    {"P8P67-REV31", UUID, Short},
-    {"P8P67-DELUXE", GbE, Long},
-    {"P8P67-EVO", GbE, Short},
-    {"P8P67-LE", RMAC, Short},
-    {"P8P67-PRO", GbE, Short},
-    {"P8P67-WS-REVOLUTION", GbE, Long},
-    {"P8P67-M", RMAC, Short},
-    {"P8P67-M-PRO", RMAC, Long},
-    {"SABERTOOTH-P67", GbE, Short},
+    {
+        "MaximusIV-Extreme",
+        MODULE_VERSION_6_SERIES,
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67", 
+        MODULE_VERSION_6_SERIES,
+        UUID, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-REV31", 
+        MODULE_VERSION_6_SERIES, 
+        UUID, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-DELUXE", 
+        MODULE_VERSION_6_SERIES,
+        GbE, NULL,
+        Long, DTS_LONG_HEADER_6_SERIES, DTS_LONG_MAGIC_V1,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-EVO",
+        MODULE_VERSION_6_SERIES,
+        GbE, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-LE", 
+        MODULE_VERSION_6_SERIES,
+        ASCII, REALTEK_MAC_HEADER_6_SERIES,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-PRO", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-PRO-REV31", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-WS-REVOLUTION", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Long, DTS_LONG_HEADER_6_SERIES, DTS_LONG_MAGIC_V3,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-M", 
+        MODULE_VERSION_6_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_6_SERIES,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8P67-M-PRO", 
+        MODULE_VERSION_6_SERIES,
+        ASCII, REALTEK_MAC_HEADER_6_SERIES,
+        Long, DTS_LONG_HEADER_6_SERIES, DTS_LONG_MAGIC_V2,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "SABERTOOTH-P67", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL, 
+                Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },
     
     // Z68
-    {"Maximus-IV-Extreme-Z", GbE, None},
-    {"MaximusIV-GENE-Z", GbE, None},
-    {"MAXIMUS-IV-GENE-Z-GEN3", GbE, None},
-    {"P8Z68-DELUXE", GbE, Long},
-    {"P8Z68-DELUXE-GEN3", GbE, Long},
-    //{"P8Z68-M-PRO", RMAC, None},
-    {"P8Z68-V", GbE, None},
-    {"P8Z68-V-GEN3", GbE, None},
-    {"P8Z68-V-LE", RMAC, None},
-    {"P8Z68-V-LX", RMAC, None},
-    {"P8Z68-V-PRO", GbE, Short},
-    {"P8Z68-V-PRO-GEN3", GbE, Short},
+    {
+        "Maximus-IV-Extreme-Z",
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "MaximusIV-GENE-Z", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "MAXIMUS-IV-GENE-Z-GEN3",
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8Z68-DELUXE", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Long, DTS_LONG_HEADER_6_SERIES, DTS_LONG_MAGIC_V1,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8Z68-DELUXE-GEN3",
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Long, DTS_LONG_HEADER_6_SERIES, DTS_LONG_MAGIC_V1,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8Z68-V", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8Z68-V-GEN3",
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,    
+    },
+        {"P8Z68-V-LE", 
+        MODULE_VERSION_6_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_6_SERIES, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES, 
+    },{
+        "P8Z68-V-LX",
+        MODULE_VERSION_6_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_6_SERIES, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES, 
+    },{
+        "P8Z68-V-PRO", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8Z68-V-PRO-GEN3",
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL,
+        Short, DTS_SHORT_HEADER_6_SERIES, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },
+
+    // B75
+    {
+        "P8B75-M-LE", 
+        MODULE_VERSION_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_B75, 
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES,
+    },
 
     // H77
-    {"P8H77-V", AMAC, None},
+    {
+        "P8H77-V",
+        MODULE_VERSION_7_SERIES, 
+        ASCII, ATHEROS_MAC_HEADER_H77,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },
 
     // Z77
-    {"MAXIMUS-V-FORMULA", GbE, None},
-    {"MAXIMUS-V-GENE", GbE, None},
-    //{"P8Z77-I-DELUXE", GbE, Long},
-    //{"P8Z77-M", RMAC, None},
-    {"P8Z77-M-PRO", UUID, None},
-    {"P8Z77-V", GbE, None},
-    {"P8Z77-V-DELUXE", GbE, None},
-    {"P8Z77-V-LE", RMAC, None},
-    //{"P8Z77-V-LE-PLUS", RMAC, None},
-    //{"P8Z77-V-LK", RMAC, None},
-    //{"P8Z77-V-PREMIUM", GbE, Long},
-    {"P8Z77-V-PRO", GbE, None},
-    //{"P8Z77-V-PRO-THUNDERBOLT", GbE, None},
-    {"P8Z77-WS", UUID, Long},
-    {"SABERTOOTH-Z77", GbE, None},
+    {
+        "MAXIMUS-V-FORMULA", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "MAXIMUS-V-GENE", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-M-PRO", 
+        MODULE_VERSION_7_SERIES, 
+        UUID, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES,
+    },{
+        "P8Z77-V", 
+        MODULE_VERSION_7_SERIES,
+        GbE, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-V-DELUXE", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES,
+    },{
+        "P8Z77-V-LE", 
+        MODULE_VERSION_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_7_SERIES, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-V-PRO", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None,  NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-WS", 
+        MODULE_VERSION_7_SERIES, 
+        UUID, NULL, 
+        Long, DTS_LONG_HEADER_7_SERIES, DTS_LONG_MAGIC_V1, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "SABERTOOTH-Z77", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None,  NULL,  NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },
+
+    // X79
+    {
+        "P9X79", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL, 
+        Long,  DTS_LONG_HEADER_X79,  DTS_LONG_MAGIC_V1, 
+        UuidPresent, UUID_HEADER_X79,
+        MbsnPresent, MBSN_HEADER_X79, 
+    },
+
+    //C602
+    {
+        "Z9PE-D16",
+        MODULE_VERSION_C602,
+        UUID, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },
 };
 
-static const unsigned int MB_FEATURE_LIST_LENGTH = sizeof(MB_FEATURE_LIST) / sizeof(MB_FEATURE_LIST[0]);
+const unsigned int SUPPORTED_MOTHERBOARDS_LIST_LENGTH = sizeof(SUPPORTED_MOTHERBOARDS_LIST) / sizeof(SUPPORTED_MOTHERBOARDS_LIST[0]);
 
 #endif // MOTHERBOARDS_H

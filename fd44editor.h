@@ -9,7 +9,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
-#include "bios.h"
+#include "motherboards.h"
 
 namespace Ui {
 class FD44Editor;
@@ -27,7 +27,6 @@ private slots:
     void openImageFile();
     void saveImageFile();
     void copyToClipboard();
-    void enableDtsMagicComboBox(int index);
     void enableSaveButton();
 
 private:
@@ -35,11 +34,11 @@ private:
     QString lastError;
     bios_t opened;
 
-    bios_t readFromBIOS(const QByteArray & bios);
-    QByteArray writeToBIOS(const QByteArray & bios, const bios_t & data);
+    bios_t readFromBIOS(const QByteArray & data);
+    QByteArray writeToBIOS(const QByteArray & data, const bios_t & bios);
 
     bios_t readFromUI();
-    void writeToUI(bios_t data);
+    void writeToUI(bios_t bios);
 };
 
 #endif // FD44EDITOR_H
