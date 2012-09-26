@@ -200,6 +200,13 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None, NULL, NULL,
         UuidPresent, UUID_HEADER_7_SERIES,
         MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8H77-V-LE",
+        MODULE_VERSION_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_H77,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
     },
 
     // Z77
@@ -240,6 +247,13 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         MbsnPresent, MBSN_HEADER_7_SERIES,
     },{
         "P8Z77-V-LE", 
+        MODULE_VERSION_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_7_SERIES, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-V-LX", 
         MODULE_VERSION_7_SERIES, 
         ASCII, REALTEK_MAC_HEADER_7_SERIES, 
         None, NULL, NULL, 

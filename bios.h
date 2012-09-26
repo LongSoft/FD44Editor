@@ -41,6 +41,7 @@ const QByteArray MODULE_HEADER_BSA = QByteArray("BSA_", 4);
 const QByteArray REALTEK_MAC_HEADER_6_SERIES = QByteArray("\x0B\x01\x0D\x00", 4);
 const QByteArray REALTEK_MAC_HEADER_7_SERIES = QByteArray("\x0B\x01\x00\x80\x09\x0D\x00\x2D\x00", 9);
 const QByteArray REALTEK_MAC_HEADER_B75 = QByteArray("\x0B\x01\x00\x80\x09\x0D\x00\x25\x00", 9);
+const QByteArray REALTEK_MAC_HEADER_H77 = QByteArray("\x0B\x01\x00\x80\x09\x0D\x00\x26\x00", 9);
 const QByteArray ATHEROS_MAC_HEADER_H77 = QByteArray("\x0B\x01\x00\x80\x09\x0D\x00\x2A\x00", 9);
 #define MAC_LENGTH 6
 #define MAC_ASCII_LENGTH 13
