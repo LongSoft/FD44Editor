@@ -207,11 +207,25 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None, NULL, NULL,
         UuidPresent, UUID_HEADER_7_SERIES,
         MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8H77-M-PRO",
+        MODULE_VERSION_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_H77_M,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
     },
 
     // Z77
     {
         "MAXIMUS-V-FORMULA", 
+        MODULE_VERSION_7_SERIES, 
+        GbE, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "MAXIMUS-V-EXTREME", 
         MODULE_VERSION_7_SERIES, 
         GbE, NULL, 
         None, NULL, NULL, 
@@ -248,14 +262,14 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
     },{
         "P8Z77-V-LE", 
         MODULE_VERSION_7_SERIES, 
-        ASCII, REALTEK_MAC_HEADER_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_Z77, 
         None, NULL, NULL, 
         UuidPresent, UUID_HEADER_7_SERIES,
         MbsnPresent, MBSN_HEADER_7_SERIES, 
     },{
         "P8Z77-V-LX", 
         MODULE_VERSION_7_SERIES, 
-        ASCII, REALTEK_MAC_HEADER_7_SERIES, 
+        ASCII, REALTEK_MAC_HEADER_Z77, 
         None, NULL, NULL, 
         UuidPresent, UUID_HEADER_7_SERIES,
         MbsnPresent, MBSN_HEADER_7_SERIES, 
