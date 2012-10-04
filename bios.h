@@ -39,11 +39,8 @@ const QByteArray MODULE_HEADER_BSA          ("BSA_", 4);
 
 // ASCII MAC
 const QByteArray ASCII_MAC_HEADER_6_SERIES  ("\x0B\x01\x0D\x00", 4);
-const QByteArray ASCII_MAC_HEADER_25        ("\x0B\x01\x00\x80\x09\x0D\x00\x25\x00", 9);
-const QByteArray ASCII_MAC_HEADER_26        ("\x0B\x01\x00\x80\x09\x0D\x00\x26\x00", 9);
-const QByteArray ASCII_MAC_HEADER_28        ("\x0B\x01\x00\x80\x09\x0D\x00\x28\x00", 9);
-const QByteArray ASCII_MAC_HEADER_2A        ("\x0B\x01\x00\x80\x09\x0D\x00\x2A\x00", 9);
-const QByteArray ASCII_MAC_HEADER_2D        ("\x0B\x01\x00\x80\x09\x0D\x00\x2D\x00", 9);
+const QByteArray ASCII_MAC_HEADER_7_SERIES  ("\x0B\x01\x00\x80\x09\x0D\x00", 7);
+#define ASCII_MAC_OFFSET                    2
 #define MAC_LENGTH                          6
 #define ASCII_MAC_LENGTH                    13
 
@@ -98,6 +95,7 @@ typedef struct {
 
 typedef struct {
     QByteArray mac;
+    char mac_magic;
     QByteArray dts_key;
     QByteArray dts_magic;
     QByteArray uuid;
@@ -124,6 +122,7 @@ typedef struct {
     QByteArray module_version;
     mac_e mac_type;
     QByteArray mac_header;
+    QByteArray mac_magic;
     dts_e dts_type;
     QByteArray dts_header;
     QByteArray dts_magic;

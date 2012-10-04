@@ -25,12 +25,12 @@ FD44Editor::~FD44Editor()
 
 void FD44Editor::openImageFile()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS image file (*.rom *.bin *.cap)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS image file (*.rom *.bin *.cap);;All files (*.*)");
 
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
     {
-        ui->statusBar->showMessage(tr("Please select existing BIOS image file"));
+        ui->statusBar->showMessage(tr("Please select existing BIOS image file."));
         return;
     }
     QFile inputFile;
@@ -38,7 +38,7 @@ void FD44Editor::openImageFile()
     
     if(!inputFile.open(QFile::ReadOnly))
     {
-        ui->statusBar->showMessage(tr("Can't open file for reading. Check file permissions"));
+        ui->statusBar->showMessage(tr("Can't open file for reading. Check file permissions."));
         return;
     }
     
@@ -57,7 +57,7 @@ void FD44Editor::saveImageFile()
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
     {
-        ui->statusBar->showMessage(tr("Please select existing BIOS image file"));
+        ui->statusBar->showMessage(tr("Please select existing BIOS image file."));
         return;
     }
 
@@ -65,7 +65,7 @@ void FD44Editor::saveImageFile()
     outputFile.setFileName(path);
     if(!outputFile.open(QFile::ReadWrite))
     {
-        ui->statusBar->showMessage(tr("Can't open file for writing. Check file permissions"));
+        ui->statusBar->showMessage(tr("Can't open file for writing. Check file permissions."));
         return;
     }
 
@@ -125,6 +125,7 @@ void FD44Editor::copyToClipboard()
 bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 {
     bios_t bios;
+    bios.data.module.dts_magic = 0;
     
     // Detecting motherboard model and BIOS version
     int pos = data.lastIndexOf(BOOTEFI_HEADER);
@@ -244,13 +245,32 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.mac_header);
         if(pos == -1)
         {
-            
             lastError = tr("ASCII MAC address is required but not found.");
             bios.data.state = ParseError;
             return bios;    
         }
 
-        bios.data.module.mac = QByteArray::fromHex(moduleBody.mid(pos + bios.mb.mac_header.length(), MAC_ASCII_LENGTH));
+        pos += bios.mb.mac_header.length();
+
+        if(bios.mb.mac_header == ASCII_MAC_HEADER_7_SERIES)
+        {
+            bool found = false;
+            bios.data.module.mac_magic = moduleBody.at(pos);
+            for(int i = 0; i < bios.mb.mac_magic.length(); i++)
+                if(bios.data.module.mac_magic == bios.mb.mac_magic.at(i))
+                {
+                    found = true;
+                    pos += ASCII_MAC_OFFSET;
+                }
+            if(!found)
+            {
+                lastError = tr("ASCII MAC address magic byte is unknown.");
+                bios.data.state = ParseError;
+                return bios;
+            }
+        }
+
+        bios.data.module.mac = QByteArray::fromHex(moduleBody.mid(pos, ASCII_MAC_LENGTH));
     }
     
     // DTS key
@@ -409,6 +429,11 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     if (bios.mb.mac_type == ASCII)
     {
         module.append(bios.mb.mac_header);
+        if(bios.mb.mac_header == ASCII_MAC_HEADER_7_SERIES)
+        {
+            module.append(bios.data.module.mac_magic ? bios.data.module.mac_magic : bios.mb.mac_magic.at(0));
+            module.append('\x00');
+        }
         module.append(bios.data.module.mac.toHex().toUpper());
         module.append('\x00');
     }
