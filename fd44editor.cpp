@@ -125,7 +125,6 @@ void FD44Editor::copyToClipboard()
 bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 {
     bios_t bios;
-    bios.data.module.dts_magic = 0;
     
     // Detecting motherboard model and BIOS version
     int pos = data.lastIndexOf(BOOTEFI_HEADER);
@@ -254,20 +253,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
         if(bios.mb.mac_header == ASCII_MAC_HEADER_7_SERIES)
         {
-            bool found = false;
             bios.data.module.mac_magic = moduleBody.at(pos);
-            for(int i = 0; i < bios.mb.mac_magic.length(); i++)
-                if(bios.data.module.mac_magic == bios.mb.mac_magic.at(i))
-                {
-                    found = true;
-                    pos += ASCII_MAC_OFFSET;
-                }
-            if(!found)
-            {
-                lastError = tr("ASCII MAC address magic byte is unknown.");
-                bios.data.state = ParseError;
-                return bios;
-            }
+            pos += ASCII_MAC_OFFSET;
         }
 
         bios.data.module.mac = QByteArray::fromHex(moduleBody.mid(pos, ASCII_MAC_LENGTH));
@@ -278,81 +265,77 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     if(bios.mb.dts_type == Short)
     {
         pos = moduleBody.indexOf(bios.mb.dts_header);
-        if(pos != -1)
-        {
-            pos += bios.mb.dts_header.length();
-            bios.data.module.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
-            pos += DTS_KEY_LENGTH;
-
-            if(moduleBody.mid(pos, DTS_SHORT_PART2.length()) != DTS_SHORT_PART2)
-            {
-                lastError = tr("Part 2 of short DTS header is unknown");
-                bios.data.state = ParseError;
-                return bios;
-            }
-        }
-        else
+        if(pos == -1)
         {
             lastError = tr("Short DTS key is required but not found.");
             bios.data.state = ParseError;
             return bios;    
+        }
+
+        pos += bios.mb.dts_header.length();
+        bios.data.module.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
+        pos += DTS_KEY_LENGTH;
+
+        if(moduleBody.mid(pos, DTS_SHORT_PART2.length()) != DTS_SHORT_PART2)
+        {
+            lastError = tr("Part 2 of short DTS header is unknown");
+            bios.data.state = ParseError;
+            return bios;
         }
     }
     // Long DTS
     if(bios.mb.dts_type == Long)
     {
         pos = moduleBody.indexOf(bios.mb.dts_header);
-        if(pos != -1)
+        if(pos == -1)
         {
-            pos += bios.mb.dts_header.length();
-            bios.data.module.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
-            pos += DTS_KEY_LENGTH;
-        
-            if(moduleBody.mid(pos, DTS_LONG_PART2.length()) !=DTS_LONG_PART2)
-            {
-                lastError = tr("Part 2 of long DTS header is unknown");
-                bios.data.state = ParseError;
-                return bios;
-            }
-            pos += DTS_LONG_PART2.length();
+            lastError = tr("Long DTS key is required but not found.");
+            bios.data.state = ParseError;
+            return bios;
+        }
 
-            QByteArray magic = moduleBody.mid(pos, bios.mb.dts_magic.length());
-            if (magic != bios.mb.dts_magic)
-            {
-                lastError = tr("Long DTS magic bytes are unknown");
-                bios.data.state = ParseError;
-                return bios;
-            }
-            pos += bios.mb.dts_magic.length();
+        pos += bios.mb.dts_header.length();
+        bios.data.module.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
+        pos += DTS_KEY_LENGTH;
 
-            if(moduleBody.mid(pos, DTS_LONG_PART3.length()) != DTS_LONG_PART3)
-            {
-                lastError = tr("Part 3 of long DTS header is unknown");
-                bios.data.state = ParseError;
-                return bios;
-            }
-            pos += DTS_LONG_PART3.length();
+        if(moduleBody.mid(pos, DTS_LONG_PART2.length()) !=DTS_LONG_PART2)
+        {
+            lastError = tr("Part 2 of long DTS header is unknown");
+            bios.data.state = ParseError;
+            return bios;
+        }
+        pos += DTS_LONG_PART2.length();
 
-            QByteArray reversedKey = moduleBody.mid(pos, DTS_KEY_LENGTH);
-            bool reversed = true;
-            for(unsigned int i = 0; i < DTS_KEY_LENGTH; i++)
-            {
-                reversed = reversed && (bios.data.module.dts_key.at(i) == (reversedKey.at(DTS_KEY_LENGTH-1-i) ^ DTS_LONG_MASK[i]));
-            }
-            if(!reversed)
-            {
-                lastError = tr("Second key bytes in long DTS are not reversed first key bytes");
-                bios.data.state = ParseError;
-                return bios;
-            }
-            pos += DTS_KEY_LENGTH;
-        
-            if(moduleBody.mid(pos, DTS_LONG_PART4.length()) != DTS_LONG_PART4)
-            {
-                lastError = tr("Part 4 of long DTS header is unknown");
-                bios.data.state = ParseError;
-                return bios;
-            }
+        bios.data.module.dts_magic = moduleBody.mid(pos, DTS_LONG_MAGIC_LENGTH);
+        pos += DTS_LONG_MAGIC_LENGTH;
+
+        if(moduleBody.mid(pos, DTS_LONG_PART3.length()) != DTS_LONG_PART3)
+        {
+            lastError = tr("Part 3 of long DTS header is unknown");
+            bios.data.state = ParseError;
+            return bios;
+        }
+        pos += DTS_LONG_PART3.length();
+
+        QByteArray reversedKey = moduleBody.mid(pos, DTS_KEY_LENGTH);
+        bool reversed = true;
+        for(unsigned int i = 0; i < DTS_KEY_LENGTH; i++)
+        {
+            reversed = reversed && (bios.data.module.dts_key.at(i) == (reversedKey.at(DTS_KEY_LENGTH-1-i) ^ DTS_LONG_MASK[i]));
+        }
+        if(!reversed)
+        {
+            lastError = tr("Second key bytes in long DTS are not reversed first key bytes");
+            bios.data.state = ParseError;
+            return bios;
+        }
+        pos += DTS_KEY_LENGTH;
+
+        if(moduleBody.mid(pos, DTS_LONG_PART4.length()) != DTS_LONG_PART4)
+        {
+            lastError = tr("Part 4 of long DTS header is unknown");
+            bios.data.state = ParseError;
+            return bios;
         }
     }
 
@@ -431,7 +414,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         module.append(bios.mb.mac_header);
         if(bios.mb.mac_header == ASCII_MAC_HEADER_7_SERIES)
         {
-            module.append(bios.data.module.mac_magic ? bios.data.module.mac_magic : bios.mb.mac_magic.at(0));
+            module.append(bios.data.module.mac_magic ? bios.data.module.mac_magic : bios.mb.mac_magic);
             module.append('\x00');
         }
         module.append(bios.data.module.mac.toHex().toUpper());
@@ -449,10 +432,10 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     // Long DTS key
     if(bios.mb.dts_type == Long)
     {
-        module.append(bios.mb.mac_header);
+        module.append(bios.mb.dts_header);
         module.append(bios.data.module.dts_key);
         module.append(DTS_LONG_PART2);
-        module.append(bios.data.module.dts_magic);
+        module.append(bios.data.module.dts_magic.isEmpty() ? bios.mb.dts_magic : bios.data.module.dts_magic);
         module.append(DTS_LONG_PART3);
         QByteArray reversedKey;
         for(unsigned int i = 0; i < DTS_KEY_LENGTH; i++)

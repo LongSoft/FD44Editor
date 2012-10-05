@@ -58,6 +58,7 @@ const QByteArray DTS_LONG_PART2             ("\x04\x04\x32\x55\xF8\x00\xA2\x02\x
 const QByteArray DTS_LONG_MAGIC_V1          ("\x43\x10\x15\x04\x20\x00\x3C\x10\x00\x00\x00\x43\x10", 13);
 const QByteArray DTS_LONG_MAGIC_V2          ("\x06\x11\x15\x04\x20\x00\x3C\x10\x00\x00\x00\x00\x00", 13); //P67-M PRO
 const QByteArray DTS_LONG_MAGIC_V3          ("\x43\x10\x84\x83\x20\x00\x3C\x10\x00\x00\x00\x43\x10", 13); //P67 WS
+#define DTS_LONG_MAGIC_LENGTH               13
 
 const QByteArray DTS_LONG_PART3             ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 13);
 const QByteArray DTS_LONG_MASK              ("\x00\x00\x00\xFF\xFF\x00\x00\x00", 8);
@@ -122,7 +123,7 @@ typedef struct {
     QByteArray module_version;
     mac_e mac_type;
     QByteArray mac_header;
-    QByteArray mac_magic;
+    char mac_magic;
     dts_e dts_type;
     QByteArray dts_header;
     QByteArray dts_magic;
