@@ -13,7 +13,15 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None, NULL, NULL,
         UuidPresent, UUID_HEADER_6_SERIES,
         MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
+        "P8H61-M-LX", 
+        MODULE_VERSION_6_SERIES,
+        ASCII, ASCII_MAC_HEADER_6_SERIES, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
     },
+
 
     // P67
     {
@@ -259,6 +267,13 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None, NULL, NULL, 
         UuidPresent, UUID_HEADER_7_SERIES,
         MbsnPresent, MBSN_HEADER_7_SERIES, 
+    },{
+        "P8Z77-M", 
+        MODULE_VERSION_7_SERIES, 
+        UUID, NULL, NULL, 
+        None, NULL, NULL, 
+        UuidPresent, UUID_HEADER_7_SERIES,
+        MbsnPresent, MBSN_HEADER_7_SERIES,
     },{
         "P8Z77-M-PRO", 
         MODULE_VERSION_7_SERIES, 
