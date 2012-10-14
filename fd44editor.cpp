@@ -79,7 +79,7 @@ void FD44Editor::saveImageFile()
     QByteArray newBios = writeToBIOS(bios, readFromUI());
     if(newBios.isEmpty())
     {
-        QMessageBox::critical(this, tr("Fatal error"), tr("Error parsing output file BIOS data.\n%1.").arg(lastError));
+        QMessageBox::critical(this, tr("Fatal error"), tr("Error parsing output file.\n%1").arg(lastError));
         return;
     }
     
@@ -130,7 +130,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     int pos = data.lastIndexOf(BOOTEFI_HEADER);
     if (pos == -1)
     {
-        lastError = tr("$BOOTEFI$ signature is not found.\nPlease open correct ASUS BIOS file.");
+        lastError = tr("$BOOTEFI$ signature not found.\nPlease open correct ASUS BIOS file.");
         bios.data.state = ParseError;
         return bios;
     }
@@ -156,7 +156,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     // TODO: add detection using ASUSBKP$ data
     if(!isSupported)
     {
-        lastError = tr("Motherboard model %1 is not yet supported.\nSend the file you open to the program author.").arg(bios.data.be.motherboard_name.constData());
+        lastError = tr("Motherboard model %1 not supported.\nSend this BIOS file to the program author.").arg(bios.data.be.motherboard_name.constData());
         bios.data.state = ParseError;
         return bios;
     }
@@ -195,7 +195,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     pos = data.indexOf(MODULE_HEADER);
     if (pos == -1)
     {
-        lastError = tr("Module is not found.");
+        lastError = tr("FD44 module not found.");
         bios.data.state = ParseError;
         return bios;
     }
@@ -217,7 +217,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         moduleVersion = module.mid(MODULE_HEADER.length(), bios.mb.module_version.length());
         if (moduleVersion != bios.mb.module_version)
         {
-            lastError = tr("Module version is unknown.");
+            lastError = tr("FD44 module version is unknown.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -244,7 +244,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.mac_header);
         if(pos == -1)
         {
-            lastError = tr("ASCII MAC address is required but not found.");
+            lastError = tr("ASCII MAC address required but not found.");
             bios.data.state = ParseError;
             return bios;    
         }
@@ -267,7 +267,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.dts_header);
         if(pos == -1)
         {
-            lastError = tr("Short DTS key is required but not found.");
+            lastError = tr("Short DTS key required but not found.");
             bios.data.state = ParseError;
             return bios;    
         }
@@ -278,7 +278,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
         if(moduleBody.mid(pos, DTS_SHORT_PART2.length()) != DTS_SHORT_PART2)
         {
-            lastError = tr("Part 2 of short DTS header is unknown");
+            lastError = tr("Part 2 of short DTS key is unknown.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -289,7 +289,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.dts_header);
         if(pos == -1)
         {
-            lastError = tr("Long DTS key is required but not found.");
+            lastError = tr("Long DTS key required but not found.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -300,7 +300,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
         if(moduleBody.mid(pos, DTS_LONG_PART2.length()) !=DTS_LONG_PART2)
         {
-            lastError = tr("Part 2 of long DTS header is unknown");
+            lastError = tr("Part 2 of long DTS key is unknown.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -311,7 +311,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
         if(moduleBody.mid(pos, DTS_LONG_PART3.length()) != DTS_LONG_PART3)
         {
-            lastError = tr("Part 3 of long DTS header is unknown");
+            lastError = tr("Part 3 of long DTS key is unknown.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -325,7 +325,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         }
         if(!reversed)
         {
-            lastError = tr("Second key bytes in long DTS are not reversed first key bytes");
+            lastError = tr("Long DTS key reversed bytes section is corrupted.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -333,7 +333,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
         if(moduleBody.mid(pos, DTS_LONG_PART4.length()) != DTS_LONG_PART4)
         {
-            lastError = tr("Part 4 of long DTS header is unknown");
+            lastError = tr("Part 4 of long DTS header is unknown.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -345,7 +345,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.uuid_header);
         if (pos == -1)
         {
-            lastError = tr("System UUID is required but not found.");
+            lastError = tr("System UUID required but not found.");
             bios.data.state = ParseError;
             return bios;  
         }
@@ -365,7 +365,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos = moduleBody.indexOf(bios.mb.mbsn_header);
         if(pos == -1)
         {
-            lastError = tr("Motherboard S/N is required but not found.");
+            lastError = tr("Motherboard S/N required but not found.");
             bios.data.state = ParseError;
             return bios;
         }
@@ -382,14 +382,14 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     int pos = data.indexOf(MODULE_HEADER);
     if (pos == -1)
     {
-        lastError = tr("Module is not found.");
+        lastError = tr("FD44 module not found.");
         return QByteArray();
     }
 
     pos = data.indexOf(BOOTEFI_HEADER);
     if (pos == -1)
     {
-        lastError = tr("$BOOTEFI$ signature is not found.\nPlease open correct ASUS BIOS file.");
+        lastError = tr("$BOOTEFI$ signature not found.\nPlease open correct ASUS BIOS file.");
         return QByteArray();
     }
 
@@ -398,9 +398,9 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     
     if (!qstrcmp(bios.mb.name, motherboard_name))
     {
-        lastError = tr("Motherboard model of loaded data are different from motherboard model in selected file.\n"\
-                       "Loaded motherboard: %1\n"\
-                       "Motherboard in selected file: %2")
+        lastError = tr("Motherboard model from loaded data are different from motherboard model from selected file.\n"\
+                       "Loaded: %1\n"\
+                       "File: %2")
                        .arg(QString(bios.mb.name))
                        .arg(QString(motherboard_name));
         return QByteArray();
@@ -491,7 +491,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     int pos2 = newData.lastIndexOf(GBE_HEADER);
     if (pos == -1)
     {
-        lastError = tr("GbE region not found in target file. \nPlease use full BIOS backup or factory BIOS file.");
+        lastError = tr("GbE region not found in selected file.\n Please use full BIOS backup or factory BIOS file.");
         return QByteArray();
     }
 
@@ -509,7 +509,7 @@ void FD44Editor::writeToUI(bios_t bios)
         return;
     case Empty:
         QMessageBox::information(this, tr("Loaded module is empty"), tr("Loaded module is empty.\nIt is normal, if you are opening BIOS file downloaded from asus.com\n"\
-                                                                        "If you are loading module from system BIOS, you must restore the module in your BIOS.\n"));
+                                                                        "If you are opening system BIOS image, you must restore module data in your BIOS.\n"));
         break;
     case Valid:
         break;
