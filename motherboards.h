@@ -340,6 +340,13 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         Long,  DTS_LONG_HEADER_X79,  DTS_LONG_MAGIC_V1, 
         UuidPresent, UUID_HEADER_X79,
         MbsnPresent, MBSN_HEADER_X79, 
+    },{
+        "SABERTOOTH-X79", 
+        MODULE_VERSION_6_SERIES, 
+        GbE, NULL, NULL, 
+        Long,  DTS_LONG_HEADER_X79,  DTS_LONG_MAGIC_V1, 
+        UuidPresent, UUID_HEADER_X79,
+        MbsnPresent, MBSN_HEADER_X79, 
     },
 
     //C602

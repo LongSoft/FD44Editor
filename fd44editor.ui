@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
-    <height>451</height>
+    <width>333</width>
+    <height>415</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.7.7</string>
+   <string>FD44Editor v0.7.8</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -55,23 +55,6 @@
        <property name="spacing">
         <number>4</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="mbLabel">
-         <property name="text">
-          <string>Motherboard:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="mbEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="biosDateLabel">
          <property name="sizePolicy">
@@ -108,6 +91,46 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="mbLabel">
+         <property name="text">
+          <string>Motherboard:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="mbEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="gbeVersionLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>GbE version:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="meVersionEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="1">
         <widget class="QLineEdit" name="biosVersionEdit">
          <property name="enabled">
@@ -131,8 +154,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="meVersionEdit">
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="dtsEdit">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -141,16 +164,13 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="gbeVersionLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="lanEdit">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
-         <property name="text">
-          <string>GbE version:</string>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -177,16 +197,6 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="lanEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="0">
         <widget class="QLabel" name="dtsLabel">
          <property name="sizePolicy">
@@ -199,29 +209,6 @@
           <string>DTS key status:     </string>
          </property>
         </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="dtsEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -238,6 +225,32 @@
        <property name="spacing">
         <number>4</number>
        </property>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="dtsKeyEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="inputMask">
+          <string>&gt;HH HH HH HH HH HH HH HH;_</string>
+         </property>
+         <property name="text">
+          <string>       </string>
+         </property>
+         <property name="maxLength">
+          <number>23</number>
+         </property>
+         <property name="cursorPosition">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>DTS key:</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
@@ -268,6 +281,25 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="mbsnEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="inputMask">
+          <string>NNNNNNNNNNNNNNN;_</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="maxLength">
+          <number>15</number>
+         </property>
+         <property name="cursorPosition">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="uuidEdit">
          <property name="enabled">
@@ -291,64 +323,6 @@
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Motherboard S/N:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="mbsnEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="inputMask">
-          <string>NNNNNNNNNNNNNNN;_</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="maxLength">
-          <number>15</number>
-         </property>
-         <property name="cursorPosition">
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>DTS key:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="dtsKeyEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="inputMask">
-          <string>&gt;HH HH HH HH HH HH HH HH;_</string>
-         </property>
-         <property name="text">
-          <string>       </string>
-         </property>
-         <property name="maxLength">
-          <number>23</number>
-         </property>
-         <property name="cursorPosition">
-          <number>0</number>
          </property>
         </widget>
        </item>
