@@ -15,6 +15,9 @@ FD44Editor::FD44Editor(QWidget *parent) :
     connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
     connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
     connect(ui->dtsKeyEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
+
+    // Enable Drag-and-Drop actions
+    setAcceptDrops(true);
 }
 
 FD44Editor::~FD44Editor()
@@ -25,28 +28,32 @@ FD44Editor::~FD44Editor()
 void FD44Editor::openImageFile()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS image file (*.rom *.bin *.cap);;All files (*.*)");
+    openImageFile(path);
+}
 
+void FD44Editor::openImageFile(QString path)
+{
     QFileInfo fileInfo = QFileInfo(path);
     if(!fileInfo.exists())
     {
         ui->statusBar->showMessage(tr("Please select existing BIOS image file."));
         return;
     }
+
     QFile inputFile;
     inputFile.setFileName(path);
-    
+
     if(!inputFile.open(QFile::ReadOnly))
     {
         ui->statusBar->showMessage(tr("Can't open file for reading. Check file permissions."));
         return;
     }
-    
+
     QByteArray biosImage = inputFile.readAll();
     inputFile.close();
 
-    writeToUI(readFromBIOS(biosImage));
-    
-    ui->statusBar->showMessage(tr("Loaded: %1").arg(fileInfo.fileName()));
+    if(writeToUI(readFromBIOS(biosImage)))
+        ui->statusBar->showMessage(tr("Loaded: %1").arg(fileInfo.fileName()));
 }
 
 void FD44Editor::saveImageFile()
@@ -531,13 +538,13 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     return newData;
 }
 
-void FD44Editor::writeToUI(bios_t bios)
+bool FD44Editor::writeToUI(bios_t bios)
 {
     switch (bios.data.state)
     {
     case ParseError:
         QMessageBox::critical(this, tr("Fatal error"), tr("Error parsing BIOS data.\n%1").arg(lastError));
-        return;
+        return false;
     case Empty:
         QMessageBox::information(this, tr("Loaded module is empty"), tr("Loaded module is empty.\nIt is normal, if you are opening BIOS file downloaded from asus.com\n"\
                                                                         "If you are opening system BIOS image, you must restore module data in your BIOS.\n"));
@@ -618,6 +625,7 @@ void FD44Editor::writeToUI(bios_t bios)
     
     ui->copyButton->setEnabled(true);
     opened = bios;
+    return true;
 }
 
 bios_t FD44Editor::readFromUI()
@@ -646,4 +654,16 @@ void FD44Editor::enableSaveButton()
     }
     else
         ui->toFileButton->setEnabled(false);
+}
+
+void FD44Editor::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasFormat("text/uri-list"))
+             event->acceptProposedAction();
+}
+
+void FD44Editor::dropEvent(QDropEvent* event)
+{
+    QString path = event->mimeData()->urls().at(0).toLocalFile();
+    openImageFile(path);
 }

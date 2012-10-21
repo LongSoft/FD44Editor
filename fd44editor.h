@@ -4,10 +4,13 @@
 #include <QMainWindow>
 #include <QByteArray>
 #include <QClipboard>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QUrl>
 
 #include "motherboards.h"
 
@@ -22,6 +25,8 @@ class FD44Editor : public QMainWindow
 public:
     explicit FD44Editor(QWidget *parent = 0);
     ~FD44Editor();
+
+    void openImageFile(QString path);
 
 private slots:
     void openImageFile();
@@ -38,7 +43,10 @@ private:
     QByteArray writeToBIOS(const QByteArray & data, const bios_t & bios);
 
     bios_t readFromUI();
-    void writeToUI(bios_t bios);
+    bool writeToUI(bios_t bios);
+
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
 };
 
 #endif // FD44EDITOR_H
