@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
+    <width>314</width>
     <height>415</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor v0.7.8</string>
+   <string>FD44Editor v0.7.9</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">

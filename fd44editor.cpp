@@ -22,7 +22,6 @@ FD44Editor::~FD44Editor()
     delete ui;
 }
 
-
 void FD44Editor::openImageFile()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open BIOS image file"),".","BIOS image file (*.rom *.bin *.cap);;All files (*.*)");
@@ -201,17 +200,23 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     }
 
     bool isEmpty = true;
+    unsigned int moduleLength;
     QByteArray module, moduleBody, moduleVersion;
     while (isEmpty && pos != -1)
     {
-        module = data.mid(pos, MODULE_LENGTH);
-
         // Checking for BSA_ signature
-        if(module.mid(MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
+        if(data.mid(pos + MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
         {
             pos = data.indexOf(MODULE_HEADER, pos+1);
             continue;
         }
+        
+        // Reading module length
+        moduleLength = (data.at(pos + MODULE_LENGTH_OFFSET + 2) << 16) +
+                       (data.at(pos + MODULE_LENGTH_OFFSET + 1) << 8)  +
+                        data.at(pos + MODULE_LENGTH_OFFSET);
+        
+        module = data.mid(pos, moduleLength);
 
         // Determining version
         moduleVersion = module.mid(MODULE_HEADER.length(), bios.mb.module_version.length());
@@ -225,7 +230,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         pos += MODULE_HEADER_LENGTH;
         
         // Checking for empty module
-        moduleBody = module.right(MODULE_LENGTH - MODULE_HEADER_LENGTH);
+        moduleBody = module.right(moduleLength - MODULE_HEADER_LENGTH);
         if (moduleBody.count('\xFF') != moduleBody.size())
             isEmpty = false;
         else
@@ -379,6 +384,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
 QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
 {
+    // Checking for module presence
     int pos = data.indexOf(MODULE_HEADER);
     if (pos == -1)
     {
@@ -386,6 +392,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         return QByteArray();
     }
 
+    // Checking for BOOTEFI header
     pos = data.indexOf(BOOTEFI_HEADER);
     if (pos == -1)
     {
@@ -393,9 +400,9 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         return QByteArray();
     }
 
+    // Checking motherboard name
     pos += BOOTEFI_HEADER.length() + BOOTEFI_MAGIC_LENGTH + BOOTEFI_BIOS_VERSION_LENGTH;
     QByteArray motherboard_name = data.mid(pos, BOOTEFI_MOTHERBOARD_NAME_LENGTH);   
-    
     if (!qstrcmp(bios.mb.name, motherboard_name))
     {
         lastError = tr("Motherboard model from loaded data are different from motherboard model from selected file.\n"\
@@ -462,11 +469,10 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         module.append(bios.data.module.mbsn);
         module.append('\x00');
     }
-    // FFs
-    module.append(QByteArray(MODULE_LENGTH - MODULE_HEADER_LENGTH - module.length(), '\xFF'));
 
     // Replacing all modules
     QByteArray newData = data;
+    int moduleLength;
     pos = data.indexOf(MODULE_HEADER);
     while(pos != -1)
     {
@@ -475,12 +481,37 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         {
             pos = data.indexOf(MODULE_HEADER, pos + MODULE_HEADER_LENGTH);
             continue;
-        }       
+        }
         
+        // Reading module length
+        moduleLength = (data.at(pos + MODULE_LENGTH_OFFSET + 2) << 16) +
+                       (data.at(pos + MODULE_LENGTH_OFFSET + 1) << 8)  +
+                        data.at(pos + MODULE_LENGTH_OFFSET);
+        if(moduleLength - MODULE_HEADER_LENGTH < module.length())
+        {
+            lastError = tr("FD44 module in output file is too small to insert all data.\n Please use another full BIOS backup or factory BIOS file.");
+            return QByteArray();
+        }
+        
+        // Replacing module data
         pos += MODULE_HEADER_LENGTH;
         newData.replace(pos, module.length(), module);
+        
+        // Inserting FF bytes to the end of the module
         pos += module.length();
+        QByteArray ffs(moduleLength - MODULE_HEADER_LENGTH - module.length(), '\xFF');
+        newData.replace(pos, ffs.length(), ffs);
+        
+        // Going to the next module
         pos = data.indexOf(MODULE_HEADER, pos);
+    }
+
+    // Checking for descriptor header in modified file
+    if(newData.left(DESCRIPTOR_HEADER_COMMON.size()) != DESCRIPTOR_HEADER_COMMON 
+    && newData.left(DESCRIPTOR_HEADER_RARE.size()) != DESCRIPTOR_HEADER_RARE)
+    {
+        lastError = tr("Descriptor header is unknown.");
+        return QByteArray();
     }
 
     if(bios.mb.mac_type != GbE)
@@ -563,6 +594,7 @@ void FD44Editor::writeToUI(bios_t bios)
     if (bios.mb.dts_type == None)
     {
         ui->dtsEdit->setText(tr("Detected from module"));
+        ui->dtsKeyEdit->setText("");
         ui->dtsKeyEdit->setEnabled(false);
     }
     else
@@ -615,4 +647,3 @@ void FD44Editor::enableSaveButton()
     else
         ui->toFileButton->setEnabled(false);
 }
-

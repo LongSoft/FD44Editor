@@ -7,6 +7,10 @@
 const QByteArray UBF_FILE_HEADER            ("\x8B\xA6\x3C\x4A\x23\x77\xFB\x48\x80\x3D\x57\x8C\xC1\xFE\xC4\x4D", 16);
 #define UBF_FILE_HEADER_SIZE                0x800
 
+// Descriptor region header
+const QByteArray DESCRIPTOR_HEADER_COMMON   ("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x5A\xA5\xF0\x0F", 20);
+const QByteArray DESCRIPTOR_HEADER_RARE     ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\xE5\x8C\x8C", 20);
+
 // BOOTEFI marker
 const QByteArray BOOTEFI_HEADER             ("$BOOTEFI$", 9);
 #define BOOTEFI_MAGIC_LENGTH                3
@@ -36,6 +40,7 @@ const QByteArray MODULE_VERSION_7_SERIES    ("\xCD", 1);
 #define MODULE_HEADER_BSA_OFFSET            28
 const QByteArray MODULE_HEADER_BSA          ("BSA_", 4);
 #define MODULE_HEADER_LENGTH                36
+#define MODULE_LENGTH_OFFSET                20
 
 // ASCII MAC
 const QByteArray ASCII_MAC_HEADER_6_SERIES  ("\x0B\x01\x0D\x00", 4);
@@ -75,8 +80,6 @@ const QByteArray MBSN_HEADER_6_SERIES       ("\x02\x07\x10\x00", 4);
 const QByteArray MBSN_HEADER_7_SERIES       ("\x02\x07\x00\x80\x09\x10\x00\x02\x00", 9);
 const QByteArray MBSN_HEADER_X79            ("\x02\x00\x00\x07\x10\x00\x00", 7);
 #define MBSN_BODY_LENGTH                    16
-
-#define MODULE_LENGTH                       552
 
 // BIOS data structures
 typedef struct {

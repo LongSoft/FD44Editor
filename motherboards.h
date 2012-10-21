@@ -7,6 +7,13 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
 {
     // H61
     {
+        "P8H61-M", 
+        MODULE_VERSION_6_SERIES,
+        ASCII, ASCII_MAC_HEADER_6_SERIES, NULL,
+        None, NULL, NULL,
+        UuidPresent, UUID_HEADER_6_SERIES,
+        MbsnPresent, MBSN_HEADER_6_SERIES,
+    },{
         "P8H61-M-LE", 
         MODULE_VERSION_6_SERIES,
         ASCII, ASCII_MAC_HEADER_6_SERIES, NULL,
