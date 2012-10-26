@@ -31,8 +31,10 @@ public:
 private slots:
     void openImageFile();
     void saveImageFile();
-    void copyToClipboard();
     void enableSaveButton();
+    void enableDtsKeyEdit(int index);
+    void enableMacMagicEdit(int index);
+    void enableDtsMagicCombobox(int index);
 
 private:
     Ui::FD44Editor *ui;

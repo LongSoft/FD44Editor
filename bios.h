@@ -34,20 +34,21 @@ const QByteArray GBE_MAC_STUB               ("\x88\x88\x88\x88\x87\x88", 6);
 
 // FD44 module
 const QByteArray MODULE_HEADER              ("\x0B\x82\x44\xFD\xAB\xF1\xC0\x41\xAE\x4E\x0C\x55\x55\x6E\xB9\xBD", 16);
-const QByteArray MODULE_VERSION_6_SERIES    ("\xD3", 1);
-const QByteArray MODULE_VERSION_C602        ("\xD1", 1);
-const QByteArray MODULE_VERSION_7_SERIES    ("\xCD", 1);
+#define MODULE_VERSION_OFFSET               25
+const QByteArray MODULE_VERSIONS            ("\x02\x04\x08", 3);
+#define MODULE_VERSION_LENGTH               1
 #define MODULE_HEADER_BSA_OFFSET            28
 const QByteArray MODULE_HEADER_BSA          ("BSA_", 4);
 #define MODULE_HEADER_LENGTH                36
 #define MODULE_LENGTH_OFFSET                20
 
 // ASCII MAC
+#define MAC_LENGTH                          6
 const QByteArray ASCII_MAC_HEADER_6_SERIES  ("\x0B\x01\x0D\x00", 4);
 const QByteArray ASCII_MAC_HEADER_7_SERIES  ("\x0B\x01\x00\x80\x09\x0D\x00", 7);
 #define ASCII_MAC_OFFSET                    2
-#define MAC_LENGTH                          6
 #define ASCII_MAC_LENGTH                    13
+#define ASCII_MAC_MAGIC_LENGTH              1
 
 // DTS key
 #define DTS_KEY_LENGTH 8
@@ -82,63 +83,37 @@ const QByteArray MBSN_HEADER_X79            ("\x02\x00\x00\x07\x10\x00\x00", 7);
 #define MBSN_BODY_LENGTH                    16
 
 // BIOS data structures
-typedef struct {
-    QByteArray motherboard_name;
-    QByteArray bios_version;
-    QByteArray bios_date;
-} bootefi_t;
+enum bios_state_e {ParseError, Empty, Valid, HasNotDetectedValues};
+enum mac_e {UUID, ASCII, GbE, MacNotDetected};
+enum dts_e {None, Short, Long, DtsNotDetected};
 
 typedef struct {
-    QByteArray me_version;
-} me_t;
-
-typedef struct {
-    QByteArray mac;
-    QByteArray gbe_version;
-} gbe_t;
-
-typedef struct {
-    QByteArray mac;
-    char mac_magic;
-    QByteArray dts_key;
-    QByteArray dts_magic;
-    QByteArray uuid;
-    QByteArray mbsn;
-} module_t;
-
-enum data_state_e {ParseError, Empty, Valid};
-enum mac_e {GbE, ASCII, UUID};
-enum dts_e {None, Short, Long};
-
-typedef struct {
-    bootefi_t be;
-    me_t me;
-    gbe_t gbe;
-    module_t module;
-    data_state_e state;
-} data_t;
-
-enum uuid_e {UuidPresent, UuidAbsent};
-enum mbsn_e {MbsnPresent, MbsnAbsent};
-
-typedef struct {
-    char name[BOOTEFI_MOTHERBOARD_NAME_LENGTH];
-    QByteArray module_version;
-    mac_e mac_type;
-    QByteArray mac_header;
-    char mac_magic;
-    dts_e dts_type;
-    QByteArray dts_header;
-    QByteArray dts_magic;
-    uuid_e uuid_status;
-    QByteArray uuid_header;
-    mbsn_e mbsn_status;
-    QByteArray mbsn_header;
-} motherboard_t;
-
-typedef struct {
-    motherboard_t mb;
-    data_t data; 
+// BIOS info
+QByteArray motherboard_name;
+QByteArray bios_version;
+QByteArray bios_date;
+QByteArray me_version;
+QByteArray module_version;
+QByteArray gbe_version;
+// MAC
+mac_e mac_type;
+QByteArray mac_header;
+QByteArray mac_magic;
+QByteArray mac;
+// DTS key
+dts_e dts_type;
+QByteArray dts_magic;
+QByteArray dts_short_header;
+QByteArray dts_long_header;
+QByteArray dts_key;
+// UUID
+QByteArray uuid_header;
+QByteArray uuid;
+// MBSN
+QByteArray mbsn_header;
+QByteArray mbsn;
+// BIOS state
+bios_state_e state;
 } bios_t;
 
 #endif // BIOS_H
