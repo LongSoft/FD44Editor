@@ -1,3 +1,16 @@
+/* fd44editor.cpp
+
+  Copyright (c) 2012, Nikolaj Schlej. All rights reserved.
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+*/
+
 #include "fd44editor.h"
 #include "ui_fd44editor.h"
 
@@ -42,7 +55,7 @@ void FD44Editor::openImageFile()
 void FD44Editor::openImageFile(QString path)
 {
     QFileInfo fileInfo = QFileInfo(path);
-    if(!fileInfo.exists())
+    if (!fileInfo.exists())
     {
         ui->statusBar->showMessage(tr("Please select existing BIOS image file."));
         return;
@@ -51,7 +64,7 @@ void FD44Editor::openImageFile(QString path)
     QFile inputFile;
     inputFile.setFileName(path);
 
-    if(!inputFile.open(QFile::ReadOnly))
+    if (!inputFile.open(QFile::ReadOnly))
     {
         ui->statusBar->showMessage(tr("Can't open file for reading. Check file permissions."));
         return;
@@ -60,7 +73,7 @@ void FD44Editor::openImageFile(QString path)
     QByteArray biosImage = inputFile.readAll();
     inputFile.close();
 
-    if(writeToUI(readFromBIOS(biosImage)))
+    if (writeToUI(readFromBIOS(biosImage)))
         ui->statusBar->showMessage(tr("Loaded: %1").arg(fileInfo.fileName()));
 }
 
@@ -69,7 +82,7 @@ void FD44Editor::saveImageFile()
     QString path = QFileDialog::getSaveFileName(this, tr("Save BIOS image file"),".","BIOS image file (*.rom *.bin *.cap);;All files (*.*)");
 
     QFileInfo fileInfo = QFileInfo(path);
-    if(!fileInfo.exists())
+    if (!fileInfo.exists())
     {
         ui->statusBar->showMessage(tr("Please select existing BIOS image file."));
         return;
@@ -77,7 +90,7 @@ void FD44Editor::saveImageFile()
 
     QFile outputFile;
     outputFile.setFileName(path);
-    if(!outputFile.open(QFile::ReadWrite))
+    if (!outputFile.open(QFile::ReadWrite))
     {
         ui->statusBar->showMessage(tr("Can't open file for writing. Check file permissions."));
         return;
@@ -85,13 +98,13 @@ void FD44Editor::saveImageFile()
 
     QByteArray bios = outputFile.readAll();
 
-    if(bios.left(UBF_FILE_HEADER.length()) == UBF_FILE_HEADER)
+    if (bios.left(UBF_FILE_HEADER.length()) == UBF_FILE_HEADER)
     {
         bios = bios.mid(UBF_FILE_HEADER_SIZE); 
     }
 
     QByteArray newBios = writeToBIOS(bios, readFromUI());
-    if(newBios.isEmpty())
+    if (newBios.isEmpty())
     {
         QMessageBox::critical(this, tr("Fatal error"), tr("Error parsing output file.\n%1").arg(lastError));
         return;
@@ -109,6 +122,9 @@ void FD44Editor::saveImageFile()
 bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 {
     bios_t bios;
+
+	// Setting default values
+	bios.mac_type = MacNotDetected;
 
     // Detecting motherboard model and BIOS version
     int pos = data.lastIndexOf(BOOTEFI_HEADER);
@@ -132,7 +148,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     for(int i = 0; i < SUPPORTED_MOTHERBOARDS_LIST_LENGTH; i++)
     {
         QByteArray motherboard_name = QByteArray(SUPPORTED_MOTHERBOARDS_LIST[i].name, bios.motherboard_name.length());
-        if(!qstrcmp(motherboard_name, bios.motherboard_name))
+        if (!qstrcmp(motherboard_name, bios.motherboard_name))
         {
             dbIndex = i;
             break;
@@ -141,15 +157,22 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
 
     // Detecting ME presence and version
     bool isFull = false;
-    pos = data.indexOf(ME_HEADER);
+	pos = data.indexOf(ME_HEADER);
     if (pos != -1)
     {
-        pos = data.indexOf(ME_VERSION_HEADER, pos);
+        if (data.indexOf(ME_5M_SIGN, pos) != -1)
+			bios.me_type = ME_5M;
+		else if (data.indexOf(ME_3M_SIGN, pos) != -1)
+			bios.me_type = ME_3M;
+		else 
+			bios.me_type = ME_15M;
+
+		pos = data.indexOf(ME_VERSION_HEADER, pos);
         if (pos != -1)
         {
-            bios.me_version = data.mid(pos + ME_VERSION_HEADER.length() + ME_VERSION_OFFSET, ME_VERSION_LENGTH);
+			bios.me_version = data.mid(pos + ME_VERSION_HEADER.length() + ME_VERSION_OFFSET, ME_VERSION_LENGTH);
+			isFull = true;
         }
-        isFull = true;
     }
 
     // Detecting GbE presence and version
@@ -182,7 +205,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     while (isEmpty && pos != -1)
     {
         // Checking for BSA_ signature
-        if(data.mid(pos + MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
+        if (data.mid(pos + MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
         {
             pos = data.indexOf(MODULE_HEADER, pos+1);
             continue;
@@ -261,7 +284,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     if (isEmpty)
     {
         // Trying to detect module data format from board database
-        if(dbIndex >= 0)
+        if (dbIndex >= 0)
         {
             bios.mac_type = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].mac_type;
             bios.mac_magic = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].mac_magic;
@@ -271,7 +294,6 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         }
         else
         {
-            bios.mac_type = MacNotDetected;
             bios.mac_magic = QByteArray();
             bios.dts_type = DtsNotDetected;
             bios.dts_magic = QByteArray();
@@ -286,11 +308,11 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     if (!bios.mac_header.isEmpty() && bios.mac_type != GbE)
     {
         pos = moduleBody.indexOf(bios.mac_header);
-        if(pos != -1 )
+        if (pos != -1 )
         {
             pos += bios.mac_header.length();
 
-            if(bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
+            if (bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
             {
                 bios.mac_magic = moduleBody.mid(pos, ASCII_MAC_MAGIC_LENGTH);
                 pos += ASCII_MAC_OFFSET;
@@ -302,9 +324,9 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         }
     }
 
-    if(!macFound)
+    if (!macFound)
     {
-        if(dbIndex >= 0)
+        if (dbIndex >= 0)
         {
             bios.mac_type = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].mac_type;
             bios.mac_magic = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].mac_magic;
@@ -319,16 +341,16 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     // Searching for DTS key
     bool dtsFound = false;
     // Searching for short DTS
-    if(!bios.dts_short_header.isEmpty())
+    if (!bios.dts_short_header.isEmpty())
     {
         pos = moduleBody.indexOf(bios.dts_short_header);
-        if(pos != -1)
+        if (pos != -1)
         {
             pos += bios.dts_short_header.length();
             bios.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
             pos += DTS_KEY_LENGTH;
 
-            if(moduleBody.mid(pos, DTS_SHORT_PART2.length()) != DTS_SHORT_PART2)
+            if (moduleBody.mid(pos, DTS_SHORT_PART2.length()) != DTS_SHORT_PART2)
             {
                 lastError = tr("Part 2 of short DTS key is unknown.");
                 bios.state = ParseError;
@@ -341,16 +363,16 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     }
 
     // Searching for long DTS
-    if(bios.dts_type != Short && !bios.dts_long_header.isEmpty())
+    if (bios.dts_type != Short && !bios.dts_long_header.isEmpty())
     {
         pos = moduleBody.indexOf(bios.dts_long_header);
-        if(pos != -1)
+        if (pos != -1)
         {
             pos += bios.dts_long_header.length();
             bios.dts_key = moduleBody.mid(pos, DTS_KEY_LENGTH);
             pos += DTS_KEY_LENGTH;
 
-            if(moduleBody.mid(pos, DTS_LONG_PART2.length()) !=DTS_LONG_PART2)
+            if (moduleBody.mid(pos, DTS_LONG_PART2.length()) !=DTS_LONG_PART2)
             {
                 lastError = tr("Part 2 of long DTS key is unknown.");
                 bios.state = ParseError;
@@ -361,7 +383,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
             bios.dts_magic = moduleBody.mid(pos, DTS_LONG_MAGIC_LENGTH);
             pos += DTS_LONG_MAGIC_LENGTH;
 
-            if(moduleBody.mid(pos, DTS_LONG_PART3.length()) != DTS_LONG_PART3)
+            if (moduleBody.mid(pos, DTS_LONG_PART3.length()) != DTS_LONG_PART3)
             {
                 lastError = tr("Part 3 of long DTS key is unknown.");
                 bios.state = ParseError;
@@ -375,7 +397,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
             {
                 reversed = reversed && (bios.dts_key.at(i) == (reversedKey.at(DTS_KEY_LENGTH-1-i) ^ DTS_LONG_MASK[i]));
             }
-            if(!reversed)
+            if (!reversed)
             {
                 lastError = tr("Long DTS key reversed bytes section is corrupted.");
                 bios.state = ParseError;
@@ -383,7 +405,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
             }
             pos += DTS_KEY_LENGTH;
 
-            if(moduleBody.mid(pos, DTS_LONG_PART4.length()) != DTS_LONG_PART4)
+            if (moduleBody.mid(pos, DTS_LONG_PART4.length()) != DTS_LONG_PART4)
             {
                 lastError = tr("Part 4 of long DTS header is unknown.");
                 bios.state = ParseError;
@@ -395,9 +417,9 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         }
     }
 
-    if(!dtsFound)
+    if (!dtsFound)
     {
-        if(dbIndex >= 0)
+        if (dbIndex >= 0)
         {
             bios.dts_type = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].dts_type;
             bios.dts_magic = SUPPORTED_MOTHERBOARDS_LIST[dbIndex].dts_magic;
@@ -410,7 +432,7 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     }
 
     // Searching for UUID
-    if(!bios.uuid_header.isEmpty())
+    if (!bios.uuid_header.isEmpty())
     {
         pos = moduleBody.indexOf(bios.uuid_header);
         if (pos == -1)
@@ -423,17 +445,17 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         bios.uuid = moduleBody.mid(pos, UUID_LENGTH);
         
         // MAC part of UUID
-        if(!macFound || bios.mac_type == UUID)
+        if (!macFound || bios.mac_type == UUID)
         {
             bios.mac = bios.uuid.right(MAC_LENGTH);
         }
     }
 
     // Searching for MBSN
-    if(!bios.mbsn_header.isEmpty())
+    if (!bios.mbsn_header.isEmpty())
     {
         pos = moduleBody.indexOf(bios.mbsn_header);
-        if(pos == -1)
+        if (pos == -1)
         {
             lastError = tr("Motherboard S/N required but not found.");
             bios.state = ParseError;
@@ -489,7 +511,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     if (bios.mac_type == ASCII)
     {
         module.append(bios.mac_header);
-        if(bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
+        if (bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
         {
             module.append(bios.mac_magic);
             module.append('\x00');
@@ -499,7 +521,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     }
    
     // Short DTS key
-    if(bios.dts_type == Short)
+    if (bios.dts_type == Short)
     {
         module.append(bios.dts_short_header);
         module.append(bios.dts_key);
@@ -507,7 +529,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     }
 
     // Long DTS key
-    if(bios.dts_type == Long)
+    if (bios.dts_type == Long)
     {
         module.append(bios.dts_long_header);
         module.append(bios.dts_key);
@@ -545,7 +567,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     while(pos != -1)
     {
         // Checking for BSA_ signature
-        if(data.mid(pos + MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
+        if (data.mid(pos + MODULE_HEADER_BSA_OFFSET, MODULE_HEADER_BSA.length()) != MODULE_HEADER_BSA)
         {
             pos = data.indexOf(MODULE_HEADER, pos + MODULE_HEADER_LENGTH);
             continue;
@@ -555,7 +577,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         moduleLength = (data.at(pos + MODULE_LENGTH_OFFSET + 2) << 16) +
                        (data.at(pos + MODULE_LENGTH_OFFSET + 1) << 8)  +
                         data.at(pos + MODULE_LENGTH_OFFSET);
-        if(moduleLength - MODULE_HEADER_LENGTH < module.length())
+        if (moduleLength - MODULE_HEADER_LENGTH < module.length())
         {
             lastError = tr("FD44 module in output file is too small to insert all data.\n Please use another full BIOS backup or factory BIOS file.");
             return QByteArray();
@@ -588,7 +610,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     }
 
     // Replacing GbE MACs
-    if(bios.mac_type == GbE)
+    if (bios.mac_type == GbE)
     {
         pos = newData.indexOf(GBE_HEADER);
         int pos2 = newData.lastIndexOf(GBE_HEADER);
@@ -602,7 +624,7 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
     }
 
     // Checking for descriptor header in modified file
-    if(newData.left(DESCRIPTOR_HEADER_COMMON.size()) != DESCRIPTOR_HEADER_COMMON
+    if (newData.left(DESCRIPTOR_HEADER_COMMON.size()) != DESCRIPTOR_HEADER_COMMON
     && newData.left(DESCRIPTOR_HEADER_RARE.size()) != DESCRIPTOR_HEADER_RARE)
     {
         lastError = tr("Descriptor header is unknown.");
@@ -627,12 +649,12 @@ bool FD44Editor::writeToUI(bios_t bios)
         QMessageBox::information(this, tr("Data format can't be detected"), tr("Module data format in opened file can't be fully detected.\n"\
                                                                                "It is normal, if you are opening BIOS backup made by ASUS tools.\n"\
                                                                                "Please setup data format manually.\n"));
-        if(bios.mac_type == MacNotDetected)
+        if (bios.mac_type == MacNotDetected)
         {
             bios.mac_type = UUID;
             bios.mac_magic = QByteArray();
         }
-        if(bios.dts_type == DtsNotDetected)
+        if (bios.dts_type == DtsNotDetected)
         {
             bios.dts_type = None;
             bios.dts_magic = QByteArray();
@@ -650,13 +672,20 @@ bool FD44Editor::writeToUI(bios_t bios)
     // ME version
     if (!bios.me_version.isEmpty())
     {
-        if(bios.me_version.length() == ME_VERSION_LENGTH)
+        if (bios.me_version.length() == ME_VERSION_LENGTH)
         {
             qint16 major =  *(qint16*)(const void*)(bios.me_version.mid(0, 2));
             qint16 minor =  *(qint16*)(const void*)(bios.me_version.mid(2, 2));
             qint16 bugfix = *(qint16*)(const void*)(bios.me_version.mid(4, 2));
             qint16 build =  *(qint16*)(const void*)(bios.me_version.mid(6, 2));
-            ui->meVersionEdit->setText(QString("%1.%2.%3.%4").arg(major).arg(minor).arg(bugfix).arg(build));
+            QString me;
+			if (bios.me_type == ME_5M)
+				me = "5M";
+			else if (bios.me_type == ME_3M)
+				me = "3M";
+			else
+				me = "1.5M";
+			ui->meVersionEdit->setText(QString("%1.%2.%3.%4 (%5)").arg(major).arg(minor).arg(bugfix).arg(build).arg(me));
         }
         else
             ui->meVersionEdit->setText(tr("Not detected"));
@@ -686,9 +715,9 @@ bool FD44Editor::writeToUI(bios_t bios)
     // DTS type
     ui->dtsTypeComboBox->clear();
     ui->dtsTypeComboBox->addItem("None", None);
-    if(!bios.dts_short_header.isEmpty())
+    if (!bios.dts_short_header.isEmpty())
         ui->dtsTypeComboBox->addItem("Short", Short);
-    if(!bios.dts_long_header.isEmpty())
+    if (!bios.dts_long_header.isEmpty())
         ui->dtsTypeComboBox->addItem("Long", Long);
 
     // MAC
@@ -701,7 +730,7 @@ bool FD44Editor::writeToUI(bios_t bios)
         break;
     case ASCII:
         ui->macStorageComboBox->setCurrentIndex(ui->macStorageComboBox->findData(ASCII));
-        if(bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
+        if (bios.mac_header == ASCII_MAC_HEADER_7_SERIES)
         {
             ui->macMagicEdit->setText(bios.mac_magic.toHex());
             ui->macMagicEdit->setEnabled(true);
@@ -756,14 +785,14 @@ bool FD44Editor::writeToUI(bios_t bios)
     ui->dtsTypeComboBox->setEnabled(true);
 
     // UUID
-    if(!bios.uuid_header.isEmpty())
+    if (!bios.uuid_header.isEmpty())
     {
         ui->uuidEdit->setText(bios.uuid.toHex());
         ui->uuidEdit->setEnabled(true);
     }
 
     // MBSN
-    if(!bios.mbsn_header.isEmpty())
+    if (!bios.mbsn_header.isEmpty())
     {
         ui->mbsnEdit->setText(bios.mbsn);
         ui->mbsnEdit->setEnabled(true);
@@ -777,12 +806,12 @@ bios_t FD44Editor::readFromUI()
 {
     bios_t bios = opened;
 
-    bios.mac = QByteArray::fromHex(ui->macEdit->text().toAscii());
-    bios.uuid = QByteArray::fromHex(ui->uuidEdit->text().toAscii());
-    bios.dts_key = QByteArray::fromHex(ui->dtsKeyEdit->text().toAscii());
-    bios.mbsn = ui->mbsnEdit->text().toAscii();
+    bios.mac = QByteArray::fromHex(ui->macEdit->text().toLatin1());
+    bios.uuid = QByteArray::fromHex(ui->uuidEdit->text().toLatin1());
+    bios.dts_key = QByteArray::fromHex(ui->dtsKeyEdit->text().toLatin1());
+    bios.mbsn = ui->mbsnEdit->text().toLatin1();
     bios.mac_type = (mac_e)ui->macStorageComboBox->itemData(ui->macStorageComboBox->currentIndex()).toInt();
-    bios.mac_magic = QByteArray::fromHex(ui->macMagicEdit->text().toAscii());
+    bios.mac_magic = QByteArray::fromHex(ui->macMagicEdit->text().toLatin1());
     bios.dts_type = (dts_e)ui->dtsTypeComboBox->itemData(ui->dtsTypeComboBox->currentIndex()).toInt();
     bios.dts_magic = ui->dtsMagicComboBox->itemData(ui->dtsMagicComboBox->currentIndex()).toByteArray();
     

@@ -1,3 +1,16 @@
+/* bios.h
+
+  Copyright (c) 2012, Nikolaj Schlej. All rights reserved.
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+*/
+
 #ifndef BIOS_H
 #define BIOS_H
 
@@ -20,16 +33,18 @@ const QByteArray BOOTEFI_HEADER             ("$BOOTEFI$", 9);
 #define BOOTEFI_MOTHERBOARD_NAME_LENGTH     60
 
 // ME header
-const QByteArray ME_HEADER                  ("\x20\x20\x80\x0F\x40\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00", 16);
+const QByteArray ME_HEADER		            ("\x00\x00\x00\x00\x24\x46\x50\x54", 8);
+const QByteArray ME_3M_SIGN					("\x4F\x50\x52\x31\xFF\xFF\xFF\xFF", 8);
+const QByteArray ME_5M_SIGN					("\x42\x49\x45\x4C\xFF\xFF\xFF\xFF", 8);
 const QByteArray ME_VERSION_HEADER          ("\x24\x4D\x4E\x32", 4);
 #define ME_VERSION_OFFSET                   4
 #define ME_VERSION_LENGTH                   8
 
 // GbE header
-const QByteArray GBE_HEADER                 ("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xC3\x10", 10);
-#define GBE_MAC_OFFSET                      (-6)
+const QByteArray GBE_HEADER                 ("\xFF\xFF\xFF\xFF\xC3\x10", 6);
+#define GBE_MAC_OFFSET                      (-10)
 const QByteArray GBE_MAC_STUB               ("\x88\x88\x88\x88\x87\x88", 6);
-#define GBE_VERSION_OFFSET                  (-2)
+#define GBE_VERSION_OFFSET                  (-6)
 #define GBE_VERSION_LENGTH                  2
 
 // FD44 module
@@ -86,12 +101,14 @@ const QByteArray MBSN_HEADER_X79            ("\x02\x00\x00\x07\x10\x00\x00", 7);
 enum bios_state_e {ParseError, Empty, Valid, HasNotDetectedValues};
 enum mac_e {UUID, ASCII, GbE, MacNotDetected};
 enum dts_e {None, Short, Long, DtsNotDetected};
+enum me_e {ME_15M, ME_3M, ME_5M};
 
 typedef struct {
 // BIOS info
 QByteArray motherboard_name;
 QByteArray bios_version;
 QByteArray bios_date;
+me_e me_type;
 QByteArray me_version;
 QByteArray module_version;
 QByteArray gbe_version;
