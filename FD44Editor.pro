@@ -16,5 +16,3 @@ HEADERS  += fd44editor.h \
 FORMS    += fd44editor.ui
 
 RC_FILE = fd44editor.rc
-
-ICON = fd44editor.icns
