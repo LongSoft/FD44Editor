@@ -49,6 +49,7 @@ private slots:
     void enableDtsKeyEdit(int index);
     void enableMacMagicEdit(int index);
     void enableDtsMagicCombobox(int index);
+	void copyToClipboard();
 
 private:
     Ui::FD44Editor *ui;

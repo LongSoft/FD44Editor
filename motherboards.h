@@ -356,6 +356,15 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         DTS_LONG_MAGIC_V1,
     },
 
+	//C204
+    {
+        "P8B-M",
+        GbE,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },
+
     //C602
     {
         "Z9PE-D16",

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>321</width>
-    <height>477</height>
+    <width>304</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor 0.8.2</string>
+   <string>FD44Editor 0.8.3</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -30,6 +30,12 @@
     </sizepolicy>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <property name="margin">
+     <number>4</number>
+    </property>
     <item>
      <widget class="QPushButton" name="fromFileButton">
       <property name="text">
@@ -400,6 +406,16 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="toClipboardButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Copy to clipboard</string>
+      </property>
      </widget>
     </item>
     <item>

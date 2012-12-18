@@ -23,6 +23,7 @@ FD44Editor::FD44Editor(QWidget *parent) :
     // Signal-slot connections
     connect(ui->fromFileButton, SIGNAL(clicked()), this, SLOT(openImageFile()));
     connect(ui->toFileButton, SIGNAL(clicked()), this, SLOT(saveImageFile()));
+	connect(ui->toClipboardButton, SIGNAL(clicked()), this, SLOT(copyToClipboard()));
     connect(ui->uuidEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
     connect(ui->macEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
     connect(ui->mbsnEdit, SIGNAL(textChanged(QString)), this, SLOT(enableSaveButton()));
@@ -75,6 +76,8 @@ void FD44Editor::openImageFile(QString path)
 
     if (writeToUI(readFromBIOS(biosImage)))
         ui->statusBar->showMessage(tr("Loaded: %1").arg(fileInfo.fileName()));
+
+	ui->toClipboardButton->setEnabled(true);
 }
 
 void FD44Editor::saveImageFile()
@@ -230,19 +233,16 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
         // Setting up module structure depending on detected module version
         // X79 motherboards have similar FD44 module header, but different data format.
         bool x79board = (bios.motherboard_name.indexOf("X79") != -1 || bios.motherboard_name.indexOf("Rampage-IV") != -1);
-        bios.module_version = moduleVersion;
+        
+		// C20x motherboards have similar FD44 module header, but different data format.
+		// TODO: replace detection algorithm, too many exclusions
+		bool c20xboard = (bios.motherboard_name.indexOf("P8B-") != -1);
+		
+		bios.module_version = moduleVersion;
         switch (MODULE_VERSIONS.indexOf(bios.module_version))
         {
-        case 0: // 6 series or X79
-            if (!x79board) // 6 series
-            {
-                bios.mac_header = ASCII_MAC_HEADER_6_SERIES;
-                bios.dts_short_header = DTS_SHORT_HEADER_6_SERIES;
-                bios.dts_long_header = DTS_LONG_HEADER_6_SERIES;
-                bios.mbsn_header = MBSN_HEADER_6_SERIES;
-                bios.uuid_header = UUID_HEADER_6_SERIES;
-            }
-            else //X79
+        case 0: // 6 series or X79 or C20x
+            if (x79board) // X79
             {
                 bios.mac_header = QByteArray();
                 bios.dts_short_header = QByteArray();
@@ -250,11 +250,27 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
                 bios.mbsn_header = MBSN_HEADER_X79;
                 bios.uuid_header = UUID_HEADER_X79;
             }
+			else if (c20xboard)	// C20x
+			{
+				bios.mac_header = QByteArray();
+				bios.dts_short_header = QByteArray();
+				bios.dts_long_header = QByteArray();
+				bios.mbsn_header = MBSN_HEADER_7_SERIES;
+				bios.uuid_header = UUID_HEADER_7_SERIES;
+			}
+			else // 6 series
+			{
+                bios.mac_header = ASCII_MAC_HEADER_6_SERIES;
+                bios.dts_short_header = DTS_SHORT_HEADER_6_SERIES;
+                bios.dts_long_header = DTS_LONG_HEADER_6_SERIES;
+                bios.mbsn_header = MBSN_HEADER_6_SERIES;
+                bios.uuid_header = UUID_HEADER_6_SERIES;
+            }
             break;
         case 1: // C602
             bios.mac_header = QByteArray();
             bios.dts_short_header = QByteArray();
-            bios.dts_long_header = DTS_LONG_HEADER_7_SERIES;
+            bios.dts_long_header = QByteArray();
             bios.mbsn_header = MBSN_HEADER_7_SERIES;
             bios.uuid_header = UUID_HEADER_7_SERIES;
             break;
@@ -713,12 +729,15 @@ bool FD44Editor::writeToUI(bios_t bios)
     ui->macStorageComboBox->addItem("GbE region and system UUID", GbE);
 
     // DTS type
-    ui->dtsTypeComboBox->clear();
+    ui->dtsTypeComboBox->setEnabled(true);
+	ui->dtsTypeComboBox->clear();
     ui->dtsTypeComboBox->addItem("None", None);
     if (!bios.dts_short_header.isEmpty())
         ui->dtsTypeComboBox->addItem("Short", Short);
     if (!bios.dts_long_header.isEmpty())
         ui->dtsTypeComboBox->addItem("Long", Long);
+	if (ui->dtsTypeComboBox->count() == 1)
+		ui->dtsTypeComboBox->setEnabled(false);
 
     // MAC
     switch (bios.mac_type)
@@ -782,7 +801,6 @@ bool FD44Editor::writeToUI(bios_t bios)
         QMessageBox::critical(this, tr("Fatal error"), tr("Undefined control path in DTS key setup.\n%1").arg(lastError));
         return false;
     }
-    ui->dtsTypeComboBox->setEnabled(true);
 
     // UUID
     if (!bios.uuid_header.isEmpty())
@@ -874,4 +892,28 @@ void FD44Editor::dropEvent(QDropEvent* event)
 {
     QString path = event->mimeData()->urls().at(0).toLocalFile();
     openImageFile(path);
+}
+
+void FD44Editor::copyToClipboard()
+{
+	QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(tr("Motherboard name: %1\n"\
+                          "BIOS date: %2\n"\
+                          "BIOS version: %3\n"\
+                          "ME version: %4\n"\
+                          "GbE version: %5\n"\
+                          "Primary LAN MAC: %6\n"\
+                          "DTS key: %7\n"
+                          "UUID: %8\n"\
+                          "MBSN: %9")
+                       .arg(ui->mbEdit->text())
+                       .arg(ui->dateEdit->text())
+                       .arg(ui->biosVersionEdit->text())
+                       .arg(ui->meVersionEdit->text())
+                       .arg(ui->gbeVersionEdit->text())
+                       .arg(ui->macEdit->text().remove(':'))
+                       .arg(ui->dtsKeyEdit->text().remove(' ').isEmpty() ? tr("Not present") : ui->dtsKeyEdit->text().remove(' '))
+                       .arg(ui->uuidEdit->text().remove(' ').append(ui->macEdit->text().remove(':')))
+                       .arg(ui->mbsnEdit->text())
+                       );
 }
