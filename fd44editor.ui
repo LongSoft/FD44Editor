@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>486</height>
+    <width>406</width>
+    <height>543</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>FD44Editor 0.8.3</string>
+   <string>FD44Editor 0.8.4</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -58,7 +58,7 @@
        <property name="spacing">
         <number>4</number>
        </property>
-       <item row="4" column="1">
+       <item row="6" column="1">
         <widget class="QLineEdit" name="gbeVersionEdit">
          <property name="enabled">
           <bool>true</bool>
@@ -68,17 +68,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="mbEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="biosVersionLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -91,7 +81,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="biosDateLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -104,8 +94,64 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="3" column="1">
         <widget class="QLineEdit" name="dateEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="meVersionEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="gbeVersionLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>GbE version:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="biosVersionEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="meVersionLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>ME version:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="mbEdit">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -121,49 +167,20 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="gbeVersionLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="recoveryNameLabel">
          <property name="text">
-          <string>GbE version:</string>
+          <string>Recovery name:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="biosVersionEdit">
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="recoveryNameEdit">
          <property name="enabled">
           <bool>true</bool>
          </property>
          <property name="readOnly">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="meVersionEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="meVersionLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>ME version:</string>
          </property>
         </widget>
        </item>
@@ -186,22 +203,6 @@
         <widget class="QLabel" name="uuidLabel">
          <property name="text">
           <string>System UUID:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="macEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="inputMask">
-          <string>&gt;HH:HH:HH:HH:HH:HH;_</string>
-         </property>
-         <property name="text">
-          <string>:::::</string>
-         </property>
-         <property name="maxLength">
-          <number>17</number>
          </property>
         </widget>
        </item>
@@ -231,6 +232,13 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="mbsnLabel">
+         <property name="text">
+          <string>Motherboard S/N:</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="uuidEdit">
          <property name="enabled">
@@ -257,6 +265,22 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="macEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="inputMask">
+          <string>&gt;HH:HH:HH:HH:HH:HH;_</string>
+         </property>
+         <property name="text">
+          <string>:::::</string>
+         </property>
+         <property name="maxLength">
+          <number>17</number>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="1">
         <widget class="QLineEdit" name="mbsnEdit">
          <property name="enabled">
@@ -276,13 +300,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="mbsnLabel">
-         <property name="text">
-          <string>Motherboard S/N:</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
@@ -291,14 +308,11 @@
       <property name="title">
        <string>Data format </string>
       </property>
-      <layout class="QFormLayout" name="formLayout">
-       <property name="horizontalSpacing">
-        <number>4</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>4</number>
-       </property>
+      <layout class="QGridLayout" name="gridLayout_3">
        <property name="margin">
+        <number>4</number>
+       </property>
+       <property name="spacing">
         <number>4</number>
        </property>
        <item row="0" column="0">

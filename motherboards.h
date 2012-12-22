@@ -310,6 +310,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None,
         QByteArray(),
     },{
+        "P8Z77-V-LE-PLUS", 
+        ASCII,
+        QByteArray("\x2D", 1),
+        None,
+        QByteArray(),
+    },{
         "P8Z77-V-LX", 
         ASCII,
         QByteArray("\x2D", 1),
@@ -359,6 +365,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
 	//C204
     {
         "P8B-M",
+        GbE,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "P8B-E-4L",
         GbE,
         QByteArray(),
         None,

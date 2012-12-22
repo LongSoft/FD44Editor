@@ -144,6 +144,8 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
     bios.motherboard_name = data.mid(pos, BOOTEFI_MOTHERBOARD_NAME_LENGTH);
     pos += BOOTEFI_MOTHERBOARD_NAME_LENGTH + BOOTEFI_BIOS_DATE_OFFSET;
     bios.bios_date = data.mid(pos, BOOTEFI_BIOS_DATE_LENGTH);
+	pos += BOOTEFI_BIOS_DATE_LENGTH + BOOTEFI_RECOVERY_NAME_OFFSET;
+	bios.recovery_name = data.mid(pos, BOOTEFI_RECOVERY_NAME_LENGTH);
 
     // Searching for that board in database
     int dbIndex = -1;
@@ -682,7 +684,8 @@ bool FD44Editor::writeToUI(bios_t bios)
 
     // BIOS information
     ui->mbEdit->setText(bios.motherboard_name);
-    ui->biosVersionEdit->setText(QString("%1%2").arg((int)bios.bios_version.at(0),2,10,QChar('0')).arg((int)bios.bios_version.at(1),2,10,QChar('0')));
+	ui->recoveryNameEdit->setText(bios.recovery_name);
+	ui->biosVersionEdit->setText(QString("%1%2").arg((int)bios.bios_version.at(0),2,10,QChar('0')).arg((int)bios.bios_version.at(1),2,10,QChar('0')));
     ui->dateEdit->setText(bios.bios_date);
 
     // ME version

@@ -31,6 +31,8 @@ const QByteArray BOOTEFI_HEADER             ("$BOOTEFI$", 9);
 #define BOOTEFI_BIOS_DATE_OFFSET            21
 #define BOOTEFI_BIOS_DATE_LENGTH            10
 #define BOOTEFI_MOTHERBOARD_NAME_LENGTH     60
+#define BOOTEFI_RECOVERY_NAME_LENGTH        12
+#define BOOTEFI_RECOVERY_NAME_OFFSET        40
 
 // ME header
 const QByteArray ME_HEADER		            ("\x00\x00\x00\x00\x24\x46\x50\x54", 8);
@@ -106,6 +108,7 @@ enum me_e {ME_15M, ME_3M, ME_5M};
 typedef struct {
 // BIOS info
 QByteArray motherboard_name;
+QByteArray recovery_name;
 QByteArray bios_version;
 QByteArray bios_date;
 me_e me_type;
