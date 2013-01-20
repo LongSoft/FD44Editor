@@ -66,6 +66,18 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         QByteArray(),
         None,
         QByteArray(),
+    },{
+        "P8H67-I",
+        ASCII,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "P8H67-V",
+        ASCII,
+        QByteArray(),
+        None,
+        QByteArray(),
     },
 
     // P67
@@ -275,6 +287,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         QByteArray(),
     },{
         "MAXIMUS-V-GENE", 
+        GbE,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "P8Z77-I-DELUXE", 
         GbE,
         QByteArray(),
         None,
