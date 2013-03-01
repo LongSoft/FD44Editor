@@ -226,6 +226,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
 
     // B75
     {
+        "P8B75-M", 
+        ASCII,
+        QByteArray("\x26", 1),
+        None,
+        QByteArray(),
+    },{
         "P8B75-M-LE", 
         ASCII,
         QByteArray("\x25", 1),
@@ -235,6 +241,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         "P8B75-M-LX", 
         ASCII,
         QByteArray("\x24", 1),
+        None,
+        QByteArray(),
+    },{
+        "P8B75-M-LX-PLUS", 
+        ASCII,
+        QByteArray("\x22", 1),
         None,
         QByteArray(),
     },
