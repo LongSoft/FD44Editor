@@ -14,15 +14,28 @@
 #ifndef BIOS_H
 #define BIOS_H
 
+#include <stdint.h>
 #include <QByteArray>
 
-// USB BIOS Flashback file header
-const QByteArray UBF_FILE_HEADER            ("\x8B\xA6\x3C\x4A\x23\x77\xFB\x48\x80\x3D\x57\x8C\xC1\xFE\xC4\x4D", 16);
-#define UBF_FILE_HEADER_SIZE                0x800
+// Capsule header
+typedef struct _EFI_CAPSULE_HEADER {
+    uint8_t   CapsuleGuid[16];
+    uint32_t  HeaderSize;
+    uint32_t  Flags;
+    uint32_t  CapsuleImageSize;
+} EFI_CAPSULE_HEADER;
 
-// Descriptor region header
-const QByteArray DESCRIPTOR_HEADER_COMMON   ("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x5A\xA5\xF0\x0F", 20);
-const QByteArray DESCRIPTOR_HEADER_RARE     ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\xE5\x8C\x8C", 20);
+// AMI Aptio extended capsule header
+typedef struct _APTIO_CAPSULE_HEADER {
+    EFI_CAPSULE_HEADER    CapsuleHeader;
+    uint16_t              RomImageOffset;	// offset in bytes from the beginning of the capsule header to the start of
+                                            // the capsule volume
+
+} APTIO_CAPSULE_HEADER;
+
+// AMI Aptio extended capsule GUID
+const QByteArray APTIO_CAPSULE_GUID
+("\x8B\xA6\x3C\x4A\x23\x77\xFB\x48\x80\x3D\x57\x8C\xC1\xFE\xC4\x4D", 16);
 
 // BOOTEFI marker
 const QByteArray BOOTEFI_HEADER             ("$BOOTEFI$", 9);

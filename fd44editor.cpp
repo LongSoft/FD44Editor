@@ -101,9 +101,11 @@ void FD44Editor::saveImageFile()
 
     QByteArray bios = outputFile.readAll();
 
-    if (bios.left(UBF_FILE_HEADER.length()) == UBF_FILE_HEADER)
+    // Remove capsule header
+    if (bios.left(APTIO_CAPSULE_GUID.length()) == APTIO_CAPSULE_GUID)
     {
-        bios = bios.mid(UBF_FILE_HEADER_SIZE); 
+        APTIO_CAPSULE_HEADER *header = (APTIO_CAPSULE_HEADER*) bios.data();
+        bios = bios.mid(header->RomImageOffset); 
     }
 
     QByteArray newBios = writeToBIOS(bios, readFromUI());
@@ -639,14 +641,6 @@ QByteArray FD44Editor::writeToBIOS(const QByteArray & data, const bios_t & bios)
         }
         newData.replace(pos + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH, bios.mac);
         newData.replace(pos2 + GBE_MAC_OFFSET - MAC_LENGTH, MAC_LENGTH, bios.mac);
-    }
-
-    // Checking for descriptor header in modified file
-    if (newData.left(DESCRIPTOR_HEADER_COMMON.size()) != DESCRIPTOR_HEADER_COMMON
-    && newData.left(DESCRIPTOR_HEADER_RARE.size()) != DESCRIPTOR_HEADER_RARE)
-    {
-        lastError = tr("Descriptor header is unknown.");
-        return QByteArray();
     }
 
     return newData;

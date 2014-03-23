@@ -40,6 +40,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None,
         QByteArray(),
     },{
+        "P8H61-M-EVO",
+        ASCII,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
         "P8H61-M-LE", 
         ASCII,
         QByteArray(),
@@ -53,6 +59,12 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         QByteArray(),
     },{
         "P8H61-M-LX", 
+        ASCII,
+        QByteArray(),
+        None,
+        QByteArray(),
+    }, {
+        "P8H61-M-PRO",
         ASCII,
         QByteArray(),
         None,
@@ -410,6 +422,51 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
     //C602
     {
         "Z9PE-D16",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },
+
+    //Z87
+    {
+        "MAXIMUS-VI-EXTREME",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "MAXIMUS-VI-HERO",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "SABERTOOTH-Z87",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "Z87-DELUXE",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "Z87-EXPERT",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "Z87I-PRO",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },{
+        "Z87-PLUS",
         UUID,
         QByteArray(),
         None,
