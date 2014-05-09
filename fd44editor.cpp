@@ -278,10 +278,17 @@ bios_t FD44Editor::readFromBIOS(const QByteArray & data)
             bios.mbsn_header = MBSN_HEADER_7_SERIES;
             bios.uuid_header = UUID_HEADER_7_SERIES;
             break;
-        case 2: // 7 series
+        case 2: // 7 and 8 series
             bios.mac_header = ASCII_MAC_HEADER_7_SERIES;
             bios.dts_short_header = QByteArray();
             bios.dts_long_header = DTS_LONG_HEADER_7_SERIES;
+            bios.mbsn_header = MBSN_HEADER_7_SERIES;
+            bios.uuid_header = UUID_HEADER_7_SERIES;
+            break;
+        case 3: // 9 series
+            bios.mac_header = ASCII_MAC_HEADER_7_SERIES;
+            bios.dts_short_header = QByteArray();
+            bios.dts_long_header = QByteArray();
             bios.mbsn_header = MBSN_HEADER_7_SERIES;
             bios.uuid_header = UUID_HEADER_7_SERIES;
             break;

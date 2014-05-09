@@ -472,6 +472,15 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
         None,
         QByteArray(),
     },
+
+    // Z97
+    {
+        "Z97-A",
+        UUID,
+        QByteArray(),
+        None,
+        QByteArray(),
+    },
 };
 
 const unsigned int SUPPORTED_MOTHERBOARDS_LIST_LENGTH = sizeof(SUPPORTED_MOTHERBOARDS_LIST) / sizeof(SUPPORTED_MOTHERBOARDS_LIST[0]);

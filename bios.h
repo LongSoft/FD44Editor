@@ -65,7 +65,7 @@ const QByteArray GBE_MAC_STUB               ("\x88\x88\x88\x88\x87\x88", 6);
 // FD44 module
 const QByteArray MODULE_HEADER              ("\x0B\x82\x44\xFD\xAB\xF1\xC0\x41\xAE\x4E\x0C\x55\x55\x6E\xB9\xBD", 16);
 #define MODULE_VERSION_OFFSET               25
-const QByteArray MODULE_VERSIONS            ("\x02\x04\x08", 3);
+const QByteArray MODULE_VERSIONS            ("\x02\x04\x08\x10", 4);
 #define MODULE_VERSION_LENGTH               1
 #define MODULE_HEADER_BSA_OFFSET            28
 const QByteArray MODULE_HEADER_BSA          ("BSA_", 4);
