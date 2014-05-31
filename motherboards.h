@@ -431,52 +431,31 @@ const motherboard_t SUPPORTED_MOTHERBOARDS_LIST[] =
     //Z87
     {
         "MAXIMUS-VI-EXTREME",
-        UUID,
+        GbE,
         QByteArray(),
         None,
         QByteArray(),
     },{
         "MAXIMUS-VI-HERO",
-        UUID,
+        GbE,
         QByteArray(),
         None,
         QByteArray(),
     },{
         "SABERTOOTH-Z87",
-        UUID,
+        GbE,
         QByteArray(),
         None,
         QByteArray(),
     },{
         "Z87-DELUXE",
-        UUID,
+        GbE,
         QByteArray(),
         None,
         QByteArray(),
     },{
         "Z87-EXPERT",
-        UUID,
-        QByteArray(),
-        None,
-        QByteArray(),
-    },{
-        "Z87I-PRO",
-        UUID,
-        QByteArray(),
-        None,
-        QByteArray(),
-    },{
-        "Z87-PLUS",
-        UUID,
-        QByteArray(),
-        None,
-        QByteArray(),
-    },
-
-    // Z97
-    {
-        "Z97-A",
-        UUID,
+        GbE,
         QByteArray(),
         None,
         QByteArray(),
