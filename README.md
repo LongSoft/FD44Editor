@@ -1,7 +1,7 @@
 # FD44Editor
 
 ## Description
-Utility to edit ASUS BIOS image files
+Utility to edit ASUS BIOS image files. This project is not supported or maintained, use it on your own risk.
 
 ## Build
 
